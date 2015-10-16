@@ -1,7 +1,17 @@
 description = 'rxactivityresponse'
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+    }
+}
+
 apply plugin: 'com.android.library'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 
 repositories {
     mavenLocal()
@@ -31,18 +41,45 @@ android {
     }
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            if (project.version.endsWith('-SNAPSHOT')) {
-                repository(url: "http://mavenproxy.finntech.no/finntech-internal-snapshot")
-            } else {
-                repository(url: "http://mavenproxy.finntech.no/finntech-internal-release")
-            }
-            pom.groupId = project.group
-            pom.artifactId = 'rxactivityresponse'
-            pom.version = project.version
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "source"
+}
 
+publishing {
+    publications {
+        Publication(MavenPublication) {
+            groupId 'no.finntech.rxactivityresponse'
+            artifactId 'rxactivityresponse'
+            version project.version
+            artifact(sourceJar)
+            artifact("$buildDir/outputs/aar/rxactivityresponse-release.aar")
+        }
+    }
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+
+    publications = ['Publication']
+    dryRun = false
+    publish = true
+    pkg {
+        repo = 'maven'
+        name = 'rxactivityresponse'
+        desc = 'RxActivityResponse for using rx + onActivityResult on android to handle things like permissions/login/settings'
+        websiteUrl = 'https://github.com/finn-no/rxactivityresponse'
+        issueTrackerUrl = 'https://github.com/finn-no/rxactivityresponse/issues'
+        vcsUrl = 'https://github.com/finn-no/rxactivityresponse.git'
+        licenses = ['Apache-2.0']
+        labels = ['rx','android','serialization','rxpermissions']
+        publicDownloadNumbers = true
+        version {
+            name = project.version
+            mavenCentralSync {
+                sync = false
+            }
         }
     }
 }
