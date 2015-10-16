@@ -1,0 +1,6 @@
+rootProject.name = 'rxactivityresponse-parent'
+include ':rxactivityresponse'
+include ':rxactivityresponse-sample'
+
+project(':rxactivityresponse').projectDir = "$rootDir/library" as File
+project(':rxactivityresponse-sample').projectDir = "$rootDir/sample" as File
