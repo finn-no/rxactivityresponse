@@ -43,6 +43,18 @@ ResponseHandler:
 }
 ```
 
+For a complete example see https://github.com/finn-no/rxactivityresponse/blob/master/sample/src/main/java/no/finntech/rxactivityresponse/sample/RxButtonExample.java
+
+## Using it
+
+Add jcenter() to your build.gradle repositories block and rxactivity response to your dependencies: 
+
+```
+
+compile('no.finntech.rxactivityresponse:rxactivityresponse:0.1')
+
+```
+
 ## License
 
     Copyright (C) 2015 FINN.no.

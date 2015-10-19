@@ -3,6 +3,7 @@ package no.finntech.rxactivityresponse.sample;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import no.finntech.android.rx.RxActivityResponseDelegate;
 
@@ -19,14 +20,13 @@ public class SerializedRxSampleActivity extends Activity {
     }
 
     @Override
-    public Object getSystemService(String name) {
+    public Object getSystemService(@NonNull String name) {
         Object o = rxActivityResponseDelegate.getSystemService(name);
         return o != null ? o : super.getSystemService(name);
     }
 
-
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         rxActivityResponseDelegate.onSaveInstanceState(outState);
     }
