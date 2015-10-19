@@ -1,8 +1,9 @@
 package no.finntech.rxactivityresponse.sample;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -12,24 +13,28 @@ import android.widget.Toast;
 
 import no.finntech.android.rx.RxActivityResponseDelegate;
 import no.finntech.android.rx.RxPermission;
+import no.finntech.android.rx.RxPlayServices;
 
+import com.google.android.gms.location.LocationRequest;
 import rx.functions.Action1;
 
-public class RxButtonExample extends Button implements View.OnClickListener {
+public class RxPlayServicesLocationExample extends Button implements View.OnClickListener {
     private ResponseHandler locationResponseHandler = new ResponseHandler();
 
-    public RxButtonExample(Context context, AttributeSet attrs) {
+    public RxPlayServicesLocationExample(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOnClickListener(this);
     }
 
     public void getLocation() {
-        RxPermission.getPermission((Activity) getContext(), locationResponseHandler, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION).subscribe(new Action1<Boolean>() {
+        final LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setNumUpdates(1);
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+
+        RxPlayServices.getLocation((Activity) getContext(), locationRequest, locationResponseHandler).subscribe(new Action1<Location>() {
             @Override
-            public void call(Boolean permission) {
-                if (permission) {
-                    Toast.makeText(getContext(), "Permission is granted and we can do something with it", Toast.LENGTH_SHORT).show();
-                }
+            public void call(Location location) {
+                Toast.makeText(getContext(), "Got a location " + location.toString(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -44,11 +49,22 @@ public class RxButtonExample extends Button implements View.OnClickListener {
     private static class ResponseHandler extends RxActivityResponseDelegate.RxResponseHandler implements Parcelable {
         @Override
         public void onRequestPermissionsResult(Activity activity, String[] permissions, int[] grantResults) {
-            super.onRequestPermissionsResult(activity, permissions, grantResults);
             if (RxPermission.allPermissionsGranted(grantResults)) {
-                ((RxButtonExample) activity.findViewById(R.id.getlocationpermission)).getLocation();
+                ((RxPlayServicesLocationExample) activity.findViewById(R.id.getlocation)).getLocation();
+            } else {
+                // permission denied
             }
-            // optionally you can handle a "permission denied" scenario here.
+        }
+
+
+        @Override
+        public void onActivityResult(Activity activity, int resultCode, Intent data) {
+            if (resultCode == Activity.RESULT_OK) {
+                // location enabled
+                ((RxPlayServicesLocationExample) activity.findViewById(R.id.getlocation)).getLocation();
+            } else {
+                // location not enabled
+            }
         }
 
         @Override
@@ -71,4 +87,5 @@ public class RxButtonExample extends Button implements View.OnClickListener {
             }
         };
     }
+
 }

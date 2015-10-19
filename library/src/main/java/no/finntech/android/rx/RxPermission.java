@@ -6,6 +6,8 @@ import android.support.v4.app.ActivityCompat;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Action0;
+import rx.subscriptions.Subscriptions;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -75,6 +77,10 @@ public class RxPermission {
 
         public abstract void showRationale();
 
+        public void onUnsubscribe() {
+
+        }
+
         public void requestPermission() {
             RxActivityResponseDelegate rxActivityResponseDelegate = RxActivityResponseDelegate.get(activity);
             rxActivityResponseDelegate.setResponse(handler);
@@ -83,6 +89,12 @@ public class RxPermission {
 
         @Override
         public Subscriber<? super RxPermission.RxPermissionResult> call(final Subscriber<? super Boolean> subscriber) {
+            subscriber.add(Subscriptions.create(new Action0() {
+                @Override
+                public void call() {
+                    onUnsubscribe();
+                }
+            }));
             return new Subscriber<RxPermission.RxPermissionResult>() {
                 @Override
                 public void onCompleted() {
@@ -91,7 +103,7 @@ public class RxPermission {
 
                 @Override
                 public void onError(Throwable throwable) {
-
+                    subscriber.onError(throwable);
                 }
 
                 @Override
@@ -99,10 +111,14 @@ public class RxPermission {
                     if (rxPermissionResult.granted) {
                         subscriber.onNext(true);
                     } else {
-                        if (rxPermissionResult.showRationale) {
-                            showRationale();
-                        } else {
-                            requestPermission();
+                        try {
+                            if (rxPermissionResult.showRationale) {
+                                showRationale();
+                            } else {
+                                requestPermission();
+                            }
+                        } catch (Exception e) {
+                            subscriber.onError(e);
                         }
                     }
                 }

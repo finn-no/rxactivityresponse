@@ -1,13 +1,13 @@
 package no.finntech.rxactivityresponse.sample;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 
 import no.finntech.android.rx.RxActivityResponseDelegate;
 
-public class SerializedRxSampleActivity extends Activity {
+public class SerializedRxSampleActivity extends AppCompatActivity {
     private Serializer serializer = new Serializer();
     private static final int RXACTIVITYREQUESTCODE = 123;
     RxActivityResponseDelegate rxActivityResponseDelegate = new RxActivityResponseDelegate(RXACTIVITYREQUESTCODE, serializer); // NB : should be a singleton

@@ -1,0 +1,84 @@
+description = 'rxactivityresponse'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+
+    maven { url "http://repo.maven.apache.org/maven2" }
+}
+
+dependencies {
+    compile project(':rxactivityresponse')
+    compile('com.google.android.gms:play-services-base:8.1.0')
+    compile('com.google.android.gms:play-services-location:8.1.0')
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.1"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 23
+    }
+
+    packagingOptions {
+        exclude 'AndroidManifest.xml'
+    }
+}
+
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier "source"
+}
+
+publishing {
+    publications {
+        Publication(MavenPublication) {
+            groupId 'no.finntech.rxactivityresponse'
+            artifactId 'playservices'
+            version project.version
+            artifact(sourceJar)
+            artifact("$buildDir/outputs/aar/rxactivityresponse-playservices-release.aar")
+        }
+    }
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+
+    publications = ['Publication']
+    dryRun = false
+    publish = true
+    pkg {
+        repo = 'maven'
+        name = 'rxactivityresponse'
+        desc = 'RxActivityResponse for using rx + onActivityResult on android to handle things like permissions/login/settings'
+        websiteUrl = 'https://github.com/finn-no/rxactivityresponse'
+        issueTrackerUrl = 'https://github.com/finn-no/rxactivityresponse/issues'
+        vcsUrl = 'https://github.com/finn-no/rxactivityresponse.git'
+        licenses = ['Apache-2.0']
+        labels = ['rx','android','serialization','rxpermissions']
+        publicDownloadNumbers = true
+        version {
+            name = project.version
+            mavenCentralSync {
+                sync = false
+            }
+        }
+    }
+}

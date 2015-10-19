@@ -4,6 +4,7 @@ apply plugin: 'com.android.application'
 
 dependencies {
     compile project(':rxactivityresponse')
+    compile project(':rxactivityresponse-playservices')
     compile('io.reactivex:rxandroid:0.24.0')
     compile('com.android.support:design:23.0.1')
 }
