@@ -13,12 +13,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import no.finntech.android.rx.PermissionRationaleOperator;
 import no.finntech.android.rx.RxActivityResponseDelegate;
 import no.finntech.android.rx.RxPermission;
 import no.finntech.android.rx.RxPlayServices;
 
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import rx.functions.Action1;
 
 public class RxPlayServicesLocationWithRationaleExample extends Button implements View.OnClickListener {
@@ -31,56 +31,32 @@ public class RxPlayServicesLocationWithRationaleExample extends Button implement
 
     public void getLocation() {
         final LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setNumUpdates(10);
+        locationRequest.setNumUpdates(1);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
         String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
 
-        RxPermission.getPermissionStatus((Activity) getContext(), permissions)
-                .lift(new RxPermission.PermissionRationaleOperator((Activity) getContext(), locationResponseHandler, permissions) {
-                    @Override
-                    public void showRationale() {
-                        Snackbar.make(RxPlayServicesLocationWithRationaleExample.this, "I need access to location..", Snackbar.LENGTH_INDEFINITE)
-                                .setAction(android.R.string.ok, new OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        requestPermission();
-                                    }
-                                }).show();
-                    }
-                })
-                .lift(new RxPlayServices.ConnectionOperator(getContext(), LocationServices.API))
-                .lift(new RxPlayServices.LocationSettingOperator((Activity) getContext(), locationRequest, locationResponseHandler))
-                .lift(new RxPlayServices.LocationOperator(locationRequest)).subscribe(new Action1<Location>() {
+        PermissionRationaleOperator rationaleOperator = new PermissionRationaleOperator((Activity) getContext(), locationResponseHandler, permissions) {
             @Override
-            public void call(Location location) {
-                //NB : if setNumUpdates != 0 you need to make sure you unsubscribe from the subscription!
-                Toast.makeText(getContext(), "Got a location " + location.toString(), Toast.LENGTH_LONG).show();
+            public void showRationale() {
+                Snackbar.make(RxPlayServicesLocationWithRationaleExample.this, "I need access to location..", Snackbar.LENGTH_INDEFINITE)
+                        .setAction(android.R.string.ok, new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                requestPermission();
+                            }
+                        }).show();
+
             }
-        });
-
-
-        /*Observable<Boolean> getPermissionObservable = RxPermission.getPermissionStatus((Activity) getContext(), permissions)
-                .lift(new RxPermission.PermissionRationaleOperator((Activity) getContext(), locationResponseHandler, permissions) {
+        };
+        RxPlayServices.getLocation((Activity) getContext(), rationaleOperator, locationRequest, locationResponseHandler)
+                .subscribe(new Action1<Location>() {
                     @Override
-                    public void showRationale() {
-                        Snackbar.make(RxPlayServicesLocationWithRationaleExample.this, "I need access to location..", Snackbar.LENGTH_INDEFINITE)
-                                .setAction(android.R.string.ok, new OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        requestPermission();
-                                    }
-                                }).show();
+                    public void call(Location location) {
+                        //NB : if setNumUpdates != 0 you need to make sure you unsubscribe from the subscription!
+                        Toast.makeText(getContext(), "Got a location " + location.toString(), Toast.LENGTH_LONG).show();
                     }
                 });
-
-        RxPlayServices.getLocation(getPermissionObservable, (Activity) getContext(), locationRequest, locationResponseHandler).subscribe(new Action1<Location>() {
-            @Override
-            public void call(Location location) {
-                //NB : if setNumUpdates != 0 you need to make sure you unsubscribe from the subscription!
-                Toast.makeText(getContext(), "Got a location " + location.toString(), Toast.LENGTH_LONG).show();
-            }
-        });*/
     }
 
 

@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import no.finntech.android.rx.PermissionRationaleOperator;
 import no.finntech.android.rx.RxActivityResponseDelegate;
 import no.finntech.android.rx.RxPermission;
 
@@ -27,7 +28,7 @@ public class RxButtonExampleWithRationale extends Button implements View.OnClick
     public void getLocation() {
         final String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
         RxPermission.getPermissionStatus((Activity) getContext(), permissions)
-                .lift(new RxPermission.PermissionRationaleOperator((Activity) getContext(), locationResponseHandler, permissions) {
+                .lift(new PermissionRationaleOperator((Activity) getContext(), locationResponseHandler, permissions) {
                     @Override
                     public void showRationale() {
                         Snackbar.make(RxButtonExampleWithRationale.this, "I need access to location..", Snackbar.LENGTH_INDEFINITE)
