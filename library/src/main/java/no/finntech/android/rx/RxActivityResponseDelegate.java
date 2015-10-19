@@ -31,12 +31,12 @@ public class RxActivityResponseDelegate {
         return (RxActivityResponseDelegate) context.getSystemService(SYSTEMSERVICE_NAME);
     }
 
-    public boolean canSetResponse() {
-        return currentResponseHandler == null;
+    public boolean hasActiveResponse() {
+        return currentResponseHandler != null;
     }
 
     public void setResponse(RxResponseHandler rxResponseHandler) {
-        if (BuildConfig.DEBUG && !canSetResponse()) {
+        if (BuildConfig.DEBUG) {
             try {
                 Bundle bundle = new Bundle();
                 serializer.serialize(bundle, currentResponseHandler);
@@ -44,7 +44,10 @@ public class RxActivityResponseDelegate {
                 Log.e(TAG, "Failed to serialize currentResponseHandler");
                 e.printStackTrace();
             }
-            throw new IllegalStateException("setResponse called with canSetResponse negative");
+
+            if (hasActiveResponse()) {
+                throw new IllegalStateException("setResponse called with hasActiveResponse negative");
+            }
         }
         this.currentResponseHandler = rxResponseHandler;
     }

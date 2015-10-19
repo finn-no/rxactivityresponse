@@ -43,6 +43,16 @@ ResponseHandler:
 }
 ```
 
+## Using it
+
+Add jcenter() to your build.gradle repositories block and rxactivity response to your dependencies: 
+
+```
+
+compile('no.finntech.rxactivityresponse:rxactivityresponse:0.1')
+
+```
+
 ## License
 
     Copyright (C) 2015 FINN.no.
