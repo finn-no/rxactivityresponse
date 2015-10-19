@@ -43,6 +43,8 @@ ResponseHandler:
 }
 ```
 
+For a complete example see https://github.com/finn-no/rxactivityresponse/blob/master/sample/src/main/java/no/finntech/rxactivityresponse/sample/RxButtonExample.java
+
 ## Using it
 
 Add jcenter() to your build.gradle repositories block and rxactivity response to your dependencies: 
