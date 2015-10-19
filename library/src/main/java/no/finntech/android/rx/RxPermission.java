@@ -64,6 +64,7 @@ public class RxPermission {
                 });
     }
 
+
     public abstract static class PermissionRationaleOperator implements Observable.Operator<Boolean, RxPermission.RxPermissionResult> {
         private final Activity activity;
         private final RxActivityResponseDelegate.RxResponseHandler handler;
