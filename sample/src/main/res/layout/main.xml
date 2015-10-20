@@ -30,5 +30,11 @@
             android:text="Get location with play services settings with rationale - full test"/>
 
 
+    <no.finntech.rxactivityresponse.sample.RxLoginExample
+            android:id="@+id/getlogintoken"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get login token"/>
+
 </LinearLayout>
 
