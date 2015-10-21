@@ -29,14 +29,13 @@ public class RxPermission {
     }
 
     public static Observable<Boolean> getPermission(final Activity activity, final RxActivityResponseDelegate.RxResponseHandler responseHandler, final String... permissions) {
-        return getPermission(activity, new PermissionWithoutRationaleOperator(activity, responseHandler, permissions), permissions);
+        return getPermission(activity, responseHandler, null, permissions);
     }
 
-    public static Observable<Boolean> getPermission(final Activity activity, PermissionRationaleOperator rationaleOperator, final String... permissions) {
+    public static Observable<Boolean> getPermission(final Activity activity, final RxActivityResponseDelegate.RxResponseHandler responseHandler, RxPermissionRationale rationaleOperator, final String... permissions) {
         return getPermissionStatus(activity, permissions)
-                .lift(rationaleOperator);
+                .lift(new PermissionRequestOperator(activity, responseHandler, rationaleOperator, permissions));
     }
-
 
     public static class RxPermissionResult {
         public final boolean granted;

@@ -1,21 +1,19 @@
 package no.finntech.rxactivityresponse.sample;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.design.widget.Snackbar;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import no.finntech.android.rx.PermissionRationaleOperator;
 import no.finntech.android.rx.RxActivityResponseDelegate;
 import no.finntech.android.rx.RxPermission;
+import no.finntech.android.rx.RxPermissionRationale;
 import no.finntech.android.rx.RxPlayServices;
 
 import com.google.android.gms.location.LocationRequest;
@@ -34,21 +32,7 @@ public class RxPlayServicesLocationWithRationaleExample extends Button implement
         locationRequest.setNumUpdates(1);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
-        String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
-
-        PermissionRationaleOperator rationaleOperator = new PermissionRationaleOperator((Activity) getContext(), locationResponseHandler, permissions) {
-            @Override
-            public void showRationale() {
-                Snackbar.make(RxPlayServicesLocationWithRationaleExample.this, "I need access to location..", Snackbar.LENGTH_INDEFINITE)
-                        .setAction(android.R.string.ok, new OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                requestPermission();
-                            }
-                        }).show();
-
-            }
-        };
+        RxPermissionRationale rationaleOperator = new SnackbarRationaleOperator(this, "I need access to ...");
         RxPlayServices.getLocation((Activity) getContext(), rationaleOperator, locationRequest, locationResponseHandler)
                 .subscribe(new Action1<Location>() {
                     @Override

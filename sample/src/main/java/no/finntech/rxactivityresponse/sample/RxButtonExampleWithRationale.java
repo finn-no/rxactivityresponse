@@ -5,15 +5,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.design.widget.Snackbar;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import no.finntech.android.rx.PermissionRationaleOperator;
 import no.finntech.android.rx.RxActivityResponseDelegate;
 import no.finntech.android.rx.RxPermission;
+import no.finntech.android.rx.RxPermissionRationale;
 
 import rx.functions.Action1;
 
@@ -27,19 +26,8 @@ public class RxButtonExampleWithRationale extends Button implements View.OnClick
 
     public void getLocation() {
         final String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
-        RxPermission.getPermissionStatus((Activity) getContext(), permissions)
-                .lift(new PermissionRationaleOperator((Activity) getContext(), locationResponseHandler, permissions) {
-                    @Override
-                    public void showRationale() {
-                        Snackbar.make(RxButtonExampleWithRationale.this, "I need access to location..", Snackbar.LENGTH_INDEFINITE)
-                                .setAction(android.R.string.ok, new OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        requestPermission();
-                                    }
-                                }).show();
-                    }
-                })
+        RxPermissionRationale rationaleOperator = new SnackbarRationaleOperator(this, "I need access to ...");
+        RxPermission.getPermission((Activity) getContext(), locationResponseHandler, rationaleOperator, permissions)
                 .subscribe(new Action1<Boolean>() {
                     @Override
                     public void call(Boolean permission) {
@@ -48,6 +36,7 @@ public class RxButtonExampleWithRationale extends Button implements View.OnClick
                         }
                     }
                 });
+
     }
 
     @Override
