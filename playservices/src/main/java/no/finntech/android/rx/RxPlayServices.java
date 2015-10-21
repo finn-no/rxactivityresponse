@@ -21,14 +21,12 @@ public class RxPlayServices {
     }
 
     public static Observable<Location> getLocation(final Activity activity, final LocationRequest locationRequest, final RxActivityResponseDelegate.RxResponseHandler responseHandler) {
-        String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
-        return getLocation(activity, new PermissionWithoutRationaleOperator(activity, responseHandler, permissions), locationRequest, responseHandler);
+        return getLocation(activity, null, locationRequest, responseHandler);
     }
 
-    public static Observable<Location> getLocation(final Activity activity, PermissionRationaleOperator rationaleOperator, final LocationRequest locationRequest, final RxActivityResponseDelegate.RxResponseHandler responseHandler) {
+    public static Observable<Location> getLocation(final Activity activity, RxPermissionRationale rationaleOperator, final LocationRequest locationRequest, final RxActivityResponseDelegate.RxResponseHandler responseHandler) {
         String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
-        return RxPermission.getPermissionStatus(activity, permissions)
-                .lift(rationaleOperator)
+        return RxPermission.getPermission(activity, responseHandler, rationaleOperator, permissions)
                 .lift(new PlayServicesPermissionsConnectionOperator(activity, LocationServices.API))
                 .lift(new LocationSettingOperator(activity, locationRequest, responseHandler))
                 .lift(new LocationOperator(locationRequest));

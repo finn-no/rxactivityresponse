@@ -5,24 +5,18 @@ import android.support.v4.app.ActivityCompat;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Action0;
-import rx.subscriptions.Subscriptions;
 
-public abstract class PermissionRationaleOperator implements Observable.Operator<Boolean, RxPermission.RxPermissionResult> {
+public class PermissionRequestOperator implements Observable.Operator<Boolean, RxPermission.RxPermissionResult> {
     private final Activity activity;
     private final RxActivityResponseDelegate.RxResponseHandler handler;
+    private final RxPermissionRationale permissionRationale;
     private final String[] permissions;
 
-    public PermissionRationaleOperator(Activity activity, RxActivityResponseDelegate.RxResponseHandler handler, final String... permissions) {
+    public PermissionRequestOperator(Activity activity, RxActivityResponseDelegate.RxResponseHandler handler, RxPermissionRationale permissionRationale, final String... permissions) {
         this.activity = activity;
         this.handler = handler;
+        this.permissionRationale = permissionRationale;
         this.permissions = permissions;
-    }
-
-    public abstract void showRationale();
-
-    public void onUnsubscribe() {
-
     }
 
     public void requestPermission() {
@@ -33,12 +27,6 @@ public abstract class PermissionRationaleOperator implements Observable.Operator
 
     @Override
     public Subscriber<? super RxPermission.RxPermissionResult> call(final Subscriber<? super Boolean> subscriber) {
-        subscriber.add(Subscriptions.create(new Action0() {
-            @Override
-            public void call() {
-                onUnsubscribe();
-            }
-        }));
         Subscriber<RxPermission.RxPermissionResult> s = new Subscriber<RxPermission.RxPermissionResult>() {
             @Override
             public void onCompleted() {
@@ -56,8 +44,13 @@ public abstract class PermissionRationaleOperator implements Observable.Operator
                     subscriber.onNext(true);
                 } else {
                     try {
-                        if (rxPermissionResult.showRationale) {
-                            showRationale();
+                        if (rxPermissionResult.showRationale && permissionRationale != null) {
+                            permissionRationale.showRationale(new Runnable() {
+                                @Override
+                                public void run() {
+                                    requestPermission();
+                                }
+                            });
                         } else {
                             requestPermission();
                         }
@@ -70,4 +63,5 @@ public abstract class PermissionRationaleOperator implements Observable.Operator
         subscriber.add(s);
         return s;
     }
+
 }
