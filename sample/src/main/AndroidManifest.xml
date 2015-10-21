@@ -14,7 +14,8 @@
         android:allowBackup="false">
 
         <activity android:name="no.finntech.rxactivityresponse.sample.SerializedRxSampleActivity"
-                  android:label="Sample">
+                  android:label="Sample"
+                  android:theme="@style/Theme.AppCompat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

@@ -1,14 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/rootview"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
 
     <no.finntech.rxactivityresponse.sample.RxButtonExample
-            android:id="@+id/getlocationbutton"
+            android:id="@+id/getlocationpermission"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Get location"/>
+
+    <no.finntech.rxactivityresponse.sample.RxButtonExampleWithRationale
+            android:id="@+id/getlocationbuttonwithrationale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get location with rationale"/>
+
+    <no.finntech.rxactivityresponse.sample.RxPlayServicesLocationExample
+            android:id="@+id/getlocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get location with play services settings++"/>
+
+    <no.finntech.rxactivityresponse.sample.RxPlayServicesLocationWithRationaleExample
+            android:id="@+id/getlocationwithrationale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get location with play services settings with rationale - full test"/>
+
 
 </LinearLayout>
 

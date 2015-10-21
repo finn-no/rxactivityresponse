@@ -29,86 +29,14 @@ public class RxPermission {
     }
 
     public static Observable<Boolean> getPermission(final Activity activity, final RxActivityResponseDelegate.RxResponseHandler responseHandler, final String... permissions) {
+        return getPermission(activity, new PermissionWithoutRationaleOperator(activity, responseHandler, permissions), permissions);
+    }
+
+    public static Observable<Boolean> getPermission(final Activity activity, PermissionRationaleOperator rationaleOperator, final String... permissions) {
         return getPermissionStatus(activity, permissions)
-                .first()
-                .lift(new Observable.Operator<Boolean, RxPermissionResult>() {
-                    @Override
-                    public Subscriber<? super RxPermissionResult> call(final Subscriber<? super Boolean> subscriber) {
-                        return new Subscriber<RxPermissionResult>() {
-                            @Override
-                            public void onCompleted() {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable throwable) {
-
-                            }
-
-                            @Override
-                            public void onNext(RxPermissionResult rxPermissionResult) {
-                                if (rxPermissionResult.granted) {
-                                    subscriber.onNext(true);
-                                } else {
-                                    RxActivityResponseDelegate rxActivityResponseDelegate = RxActivityResponseDelegate.get(activity);
-                                    if (!rxActivityResponseDelegate.hasActiveResponse()) {
-                                        rxActivityResponseDelegate.setResponse(responseHandler);
-                                        ActivityCompat.requestPermissions(activity, permissions, rxActivityResponseDelegate.getRequestCode());
-                                    }
-                                }
-                            }
-                        };
-                    }
-                });
+                .lift(rationaleOperator);
     }
 
-    public abstract static class PermissionRationaleOperator implements Observable.Operator<Boolean, RxPermission.RxPermissionResult> {
-        private final Activity activity;
-        private final RxActivityResponseDelegate.RxResponseHandler handler;
-        private final String[] permissions;
-
-        public PermissionRationaleOperator(Activity activity, RxActivityResponseDelegate.RxResponseHandler handler, final String... permissions) {
-            this.activity = activity;
-            this.handler = handler;
-            this.permissions = permissions;
-        }
-
-        public abstract void showRationale();
-
-        public void requestPermission() {
-            RxActivityResponseDelegate rxActivityResponseDelegate = RxActivityResponseDelegate.get(activity);
-            rxActivityResponseDelegate.setResponse(handler);
-            ActivityCompat.requestPermissions(activity, permissions, rxActivityResponseDelegate.getRequestCode());
-        }
-
-        @Override
-        public Subscriber<? super RxPermission.RxPermissionResult> call(final Subscriber<? super Boolean> subscriber) {
-            return new Subscriber<RxPermission.RxPermissionResult>() {
-                @Override
-                public void onCompleted() {
-
-                }
-
-                @Override
-                public void onError(Throwable throwable) {
-
-                }
-
-                @Override
-                public void onNext(RxPermission.RxPermissionResult rxPermissionResult) {
-                    if (rxPermissionResult.granted) {
-                        subscriber.onNext(true);
-                    } else {
-                        if (rxPermissionResult.showRationale) {
-                            showRationale();
-                        } else {
-                            requestPermission();
-                        }
-                    }
-                }
-            };
-        }
-    }
 
     public static class RxPermissionResult {
         public final boolean granted;
