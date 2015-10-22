@@ -2,7 +2,6 @@ package no.finn.rxactivityresponse.sample;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -11,9 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import no.finn.android.rx.RxActivityResponseDelegate;
-import no.finn.android.rx.RxPermission;
 import no.finn.android.rx.RxPlayServices;
+import no.finn.android.rx.RxResponseHandler;
 
 import com.google.android.gms.location.LocationRequest;
 import rx.functions.Action1;
@@ -46,24 +44,11 @@ public class RxPlayServicesLocationExample extends Button implements View.OnClic
 
     // This class handles restarting the permission request when a permission is retrieved. Since this class can be serialized
     // we could also pass extra arguments through here and back to the getLocation function.
-    private static class ResponseHandler extends RxActivityResponseDelegate.RxResponseHandler implements Parcelable {
+    private static class ResponseHandler extends RxResponseHandler implements Parcelable {
         @Override
-        public void onRequestPermissionsResult(Activity activity, String[] permissions, int[] grantResults) {
-            if (RxPermission.allPermissionsGranted(grantResults)) {
+        public void onResponse(Activity activity, boolean success, Response response) {
+            if (success) {
                 ((RxPlayServicesLocationExample) activity.findViewById(R.id.getlocation)).getLocation();
-            } else {
-                // permission denied
-            }
-        }
-
-
-        @Override
-        public void onActivityResult(Activity activity, int resultCode, Intent data) {
-            if (resultCode == Activity.RESULT_OK) {
-                // location enabled
-                ((RxPlayServicesLocationExample) activity.findViewById(R.id.getlocation)).getLocation();
-            } else {
-                // location not enabled
             }
         }
 

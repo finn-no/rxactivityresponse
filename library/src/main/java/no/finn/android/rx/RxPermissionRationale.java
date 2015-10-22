@@ -1,5 +1,23 @@
 package no.finn.android.rx;
 
-public interface RxPermissionRationale {
-    void showRationale(Runnable requestPermission);
+public abstract class RxPermissionRationale {
+    final boolean alwaysShowRationale;
+
+    public RxPermissionRationale() {
+        this(false);
+    }
+
+    public RxPermissionRationale(boolean alwaysShowRationale) {
+        this.alwaysShowRationale = alwaysShowRationale;
+    }
+
+    public abstract void showRationale(RequestPermission requestPermission);
+
+    public void onUnsubscribe() {
+
+    }
+
+    public interface RequestPermission {
+        void execute();
+    }
 }

@@ -4,16 +4,17 @@ import android.os.Bundle;
 import android.os.Parcelable;
 
 import no.finn.android.rx.RxActivityResponseDelegate;
+import no.finn.android.rx.RxResponseHandler;
 
 class Serializer implements RxActivityResponseDelegate.BundleSerializer {
 
     @Override
-    public void serialize(Bundle bundle, RxActivityResponseDelegate.RxResponseHandler rxResponseHandler) {
+    public void serialize(Bundle bundle, RxResponseHandler rxResponseHandler) {
         bundle.putParcelable("RxActivityResponseDelegateObject", ((Parcelable) rxResponseHandler));
     }
 
     @Override
-    public RxActivityResponseDelegate.RxResponseHandler deserialize(Bundle bundle) {
+    public RxResponseHandler deserialize(Bundle bundle) {
         if (bundle != null && bundle.containsKey("RxActivityResponseDelegateObject")) {
             return bundle.getParcelable("RxActivityResponseDelegateObject");
         } return null;

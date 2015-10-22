@@ -21,17 +21,17 @@ public class PlayServicesPermissionsConnectionOperator implements Observable.Ope
 
     private final Activity activity;
     private final Scope[] scopes;
-    private final RxActivityResponseDelegate.RxResponseHandler responseHandler;
+    private final RxResponseHandler responseHandler;
     private final Api<? extends Api.ApiOptions.NotRequiredOptions>[] services;
     private GoogleApiClient client;
 
     @SafeVarargs
-    public PlayServicesPermissionsConnectionOperator(Activity activity, RxActivityResponseDelegate.RxResponseHandler responseHandler, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+    public PlayServicesPermissionsConnectionOperator(Activity activity, RxResponseHandler responseHandler, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
         this(activity, responseHandler, null, services);
     }
 
     @SafeVarargs
-    public PlayServicesPermissionsConnectionOperator(Activity activity, RxActivityResponseDelegate.RxResponseHandler responseHandler, Scope[] scopes, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+    public PlayServicesPermissionsConnectionOperator(Activity activity, RxResponseHandler responseHandler, Scope[] scopes, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
         this.activity = activity;
         this.scopes = scopes;
         this.responseHandler = responseHandler;

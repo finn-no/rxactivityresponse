@@ -28,11 +28,11 @@ public class RxPermission {
         });
     }
 
-    public static Observable<Boolean> getPermission(final Activity activity, final RxActivityResponseDelegate.RxResponseHandler responseHandler, final String... permissions) {
+    public static Observable<Boolean> getPermission(final Activity activity, final RxResponseHandler responseHandler, final String... permissions) {
         return getPermission(activity, responseHandler, null, permissions);
     }
 
-    public static Observable<Boolean> getPermission(final Activity activity, final RxActivityResponseDelegate.RxResponseHandler responseHandler, RxPermissionRationale rationaleOperator, final String... permissions) {
+    public static Observable<Boolean> getPermission(final Activity activity, final RxResponseHandler responseHandler, RxPermissionRationale rationaleOperator, final String... permissions) {
         return getPermissionStatus(activity, permissions)
                 .lift(new PermissionRequestOperator(activity, responseHandler, rationaleOperator, permissions));
     }

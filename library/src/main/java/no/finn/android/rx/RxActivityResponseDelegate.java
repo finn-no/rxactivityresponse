@@ -84,16 +84,6 @@ public class RxActivityResponseDelegate {
         currentResponseHandler = serializer.deserialize(savedInstanceState);
     }
 
-    public static class RxResponseHandler {
-        public void onActivityResult(Activity activity, int resultCode, Intent data) {
-
-        }
-
-        public void onRequestPermissionsResult(Activity activity, String[] permissions, int[] grantResults) {
-
-        }
-    }
-
     public interface BundleSerializer {
         void serialize(Bundle bundle, RxResponseHandler rxResponseHandler);
 

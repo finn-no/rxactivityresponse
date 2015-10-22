@@ -18,9 +18,9 @@ import rx.Subscriber;
 public class LocationSettingOperator implements Observable.Operator<GoogleApiClient, GoogleApiClient> {
     private final Activity activity;
     private final LocationRequest locationRequest;
-    private final RxActivityResponseDelegate.RxResponseHandler responseHandler;
+    private final RxResponseHandler responseHandler;
 
-    public LocationSettingOperator(Activity activity, LocationRequest locationRequest, RxActivityResponseDelegate.RxResponseHandler responseHandler) {
+    public LocationSettingOperator(Activity activity, LocationRequest locationRequest, RxResponseHandler responseHandler) {
         this.activity = activity;
         this.locationRequest = locationRequest;
         this.responseHandler = responseHandler;

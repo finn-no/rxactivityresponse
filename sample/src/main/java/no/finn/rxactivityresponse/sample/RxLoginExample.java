@@ -6,7 +6,6 @@ import android.Manifest;
 import android.accounts.Account;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcel;
@@ -19,6 +18,7 @@ import android.widget.Toast;
 import no.finn.android.rx.PlayServicesPermissionsConnectionOperator;
 import no.finn.android.rx.RxActivityResponseDelegate;
 import no.finn.android.rx.RxPermission;
+import no.finn.android.rx.RxResponseHandler;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -141,18 +141,10 @@ public class RxLoginExample extends Button implements View.OnClickListener {
 
     // This class handles restarting the permission request when a permission is retrieved. Since this class can be serialized
     // we could also pass extra arguments through here and back to the getLocation function.
-    private static class ResponseHandler extends RxActivityResponseDelegate.RxResponseHandler implements Parcelable {
+    private static class ResponseHandler extends RxResponseHandler implements Parcelable {
         @Override
-        public void onRequestPermissionsResult(Activity activity, String[] permissions, int[] grantResults) {
-            if (RxPermission.allPermissionsGranted(grantResults)) {
-                ((RxLoginExample) activity.findViewById(R.id.getlogintoken)).getLoginToken();
-            }
-            // optionally you can handle a "permission denied" scenario here.
-        }
-
-        @Override
-        public void onActivityResult(Activity activity, int resultCode, Intent data) {
-            if (resultCode == Activity.RESULT_OK) {
+        public void onResponse(Activity activity, boolean success, Response response) {
+            if (success) {
                 ((RxLoginExample) activity.findViewById(R.id.getlogintoken)).getLoginToken();
             }
         }
