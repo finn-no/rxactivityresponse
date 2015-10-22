@@ -51,8 +51,8 @@ Add jcenter() to your build.gradle repositories block and rxactivity response to
 
 ```
 
-compile('no.finn.rxactivityresponse:library:0.2')
-compile('no.finn.rxactivityresponse:playservices:0.2')
+compile('no.finn.rxactivityresponse:library:0.3')
+compile('no.finn.rxactivityresponse:playservices:0.3')
 
 ```
 
