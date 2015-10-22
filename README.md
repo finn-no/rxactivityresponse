@@ -43,7 +43,7 @@ ResponseHandler:
 }
 ```
 
-For a complete example see https://github.com/finn-no/rxactivityresponse/blob/master/sample/src/main/java/no/finntech/rxactivityresponse/sample/RxButtonExample.java
+For a complete example see https://github.com/finn-no/rxactivityresponse/blob/master/sample/src/main/java/no/finn/rxactivityresponse/sample/RxButtonExample.java
 
 ## Using it
 
@@ -51,7 +51,8 @@ Add jcenter() to your build.gradle repositories block and rxactivity response to
 
 ```
 
-compile('no.finntech.rxactivityresponse:rxactivityresponse:0.1')
+compile('no.finn.rxactivityresponse:library:0.2')
+compile('no.finn.rxactivityresponse:playservices:0.2')
 
 ```
 

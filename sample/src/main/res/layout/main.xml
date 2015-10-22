@@ -5,32 +5,32 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <no.finntech.rxactivityresponse.sample.RxButtonExample
+    <no.finn.rxactivityresponse.sample.RxButtonExample
             android:id="@+id/getlocationpermission"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Get location"/>
 
-    <no.finntech.rxactivityresponse.sample.RxButtonExampleWithRationale
+    <no.finn.rxactivityresponse.sample.RxButtonExampleWithRationale
             android:id="@+id/getlocationbuttonwithrationale"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Get location with rationale"/>
 
-    <no.finntech.rxactivityresponse.sample.RxPlayServicesLocationExample
+    <no.finn.rxactivityresponse.sample.RxPlayServicesLocationExample
             android:id="@+id/getlocation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Get location with play services settings++"/>
 
-    <no.finntech.rxactivityresponse.sample.RxPlayServicesLocationWithRationaleExample
+    <no.finn.rxactivityresponse.sample.RxPlayServicesLocationWithRationaleExample
             android:id="@+id/getlocationwithrationale"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Get location with play services settings with rationale - full test"/>
 
 
-    <no.finntech.rxactivityresponse.sample.RxLoginExample
+    <no.finn.rxactivityresponse.sample.RxLoginExample
             android:id="@+id/getlogintoken"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

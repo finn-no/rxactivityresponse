@@ -1,4 +1,4 @@
-package no.finntech.android.rx;
+package no.finn.android.rx;
 
 public interface RxPermissionRationale {
     void showRationale(Runnable requestPermission);

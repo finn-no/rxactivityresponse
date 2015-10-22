@@ -48,8 +48,8 @@ task sourceJar(type: Jar) {
 publishing {
     publications {
         Publication(MavenPublication) {
-            groupId 'no.finntech.rxactivityresponse'
-            artifactId 'rxactivityresponse'
+            groupId 'no.finn.rxactivityresponse'
+            artifactId 'library'
             version project.version
             artifact(sourceJar)
             artifact("$buildDir/outputs/aar/rxactivityresponse-release.aar")

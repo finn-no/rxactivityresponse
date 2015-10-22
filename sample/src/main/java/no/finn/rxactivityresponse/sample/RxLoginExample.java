@@ -1,4 +1,4 @@
-package no.finntech.rxactivityresponse.sample;
+package no.finn.rxactivityresponse.sample;
 
 import java.io.IOException;
 
@@ -16,9 +16,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import no.finntech.android.rx.PlayServicesPermissionsConnectionOperator;
-import no.finntech.android.rx.RxActivityResponseDelegate;
-import no.finntech.android.rx.RxPermission;
+import no.finn.android.rx.PlayServicesPermissionsConnectionOperator;
+import no.finn.android.rx.RxActivityResponseDelegate;
+import no.finn.android.rx.RxPermission;
 
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;

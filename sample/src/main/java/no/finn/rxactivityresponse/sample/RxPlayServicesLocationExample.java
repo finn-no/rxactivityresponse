@@ -1,4 +1,4 @@
-package no.finntech.rxactivityresponse.sample;
+package no.finn.rxactivityresponse.sample;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,9 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import no.finntech.android.rx.RxActivityResponseDelegate;
-import no.finntech.android.rx.RxPermission;
-import no.finntech.android.rx.RxPlayServices;
+import no.finn.android.rx.RxActivityResponseDelegate;
+import no.finn.android.rx.RxPermission;
+import no.finn.android.rx.RxPlayServices;
 
 import com.google.android.gms.location.LocationRequest;
 import rx.functions.Action1;

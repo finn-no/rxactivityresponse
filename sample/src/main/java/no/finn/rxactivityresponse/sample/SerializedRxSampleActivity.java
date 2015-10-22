@@ -1,11 +1,11 @@
-package no.finntech.rxactivityresponse.sample;
+package no.finn.rxactivityresponse.sample;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
-import no.finntech.android.rx.RxActivityResponseDelegate;
+import no.finn.android.rx.RxActivityResponseDelegate;
 
 public class SerializedRxSampleActivity extends AppCompatActivity {
     private Serializer serializer = new Serializer();

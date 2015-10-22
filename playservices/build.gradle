@@ -48,7 +48,7 @@ task sourceJar(type: Jar) {
 publishing {
     publications {
         Publication(MavenPublication) {
-            groupId 'no.finntech.rxactivityresponse'
+            groupId 'no.finn.rxactivityresponse'
             artifactId 'playservices'
             version project.version
             artifact(sourceJar)
@@ -72,7 +72,7 @@ bintray {
         issueTrackerUrl = 'https://github.com/finn-no/rxactivityresponse/issues'
         vcsUrl = 'https://github.com/finn-no/rxactivityresponse.git'
         licenses = ['Apache-2.0']
-        labels = ['rx','android','serialization','rxpermissions']
+        labels = ['rx','android','serialization','rxpermissions', 'rxplayservices']
         publicDownloadNumbers = true
         version {
             name = project.version

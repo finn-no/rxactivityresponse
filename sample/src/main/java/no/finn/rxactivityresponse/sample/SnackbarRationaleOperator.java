@@ -1,9 +1,9 @@
-package no.finntech.rxactivityresponse.sample;
+package no.finn.rxactivityresponse.sample;
 
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
-import no.finntech.android.rx.RxPermissionRationale;
+import no.finn.android.rx.RxPermissionRationale;
 
 public class SnackbarRationaleOperator implements RxPermissionRationale {
     private final View activity;

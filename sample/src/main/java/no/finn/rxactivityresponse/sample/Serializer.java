@@ -1,9 +1,9 @@
-package no.finntech.rxactivityresponse.sample;
+package no.finn.rxactivityresponse.sample;
 
 import android.os.Bundle;
 import android.os.Parcelable;
 
-import no.finntech.android.rx.RxActivityResponseDelegate;
+import no.finn.android.rx.RxActivityResponseDelegate;
 
 class Serializer implements RxActivityResponseDelegate.BundleSerializer {
 
