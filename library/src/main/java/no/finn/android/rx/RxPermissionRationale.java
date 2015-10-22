@@ -13,6 +13,10 @@ public abstract class RxPermissionRationale {
 
     public abstract void showRationale(RequestPermission requestPermission);
 
+    public void onUnsubscribe() {
+
+    }
+
     public interface RequestPermission {
         void execute();
     }
