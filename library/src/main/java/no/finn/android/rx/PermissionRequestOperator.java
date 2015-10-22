@@ -39,8 +39,7 @@ public class PermissionRequestOperator implements Observable.Operator<Boolean, R
                     subscriber.onNext(true);
                 } else {
                     try {
-                        if (rxPermissionResult.showRationale && permissionRationale != null) {
-
+                        if (permissionRationale != null && (rxPermissionResult.showRationale || permissionRationale.alwaysShowRationale)) {
                             permissionRationale.showRationale(requestPermissionHandler);
                         } else {
                             requestPermissionHandler.execute();

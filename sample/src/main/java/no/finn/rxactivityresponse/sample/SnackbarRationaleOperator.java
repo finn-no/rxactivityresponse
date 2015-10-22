@@ -5,7 +5,7 @@ import android.view.View;
 
 import no.finn.android.rx.RxPermissionRationale;
 
-public class SnackbarRationaleOperator implements RxPermissionRationale {
+public class SnackbarRationaleOperator extends RxPermissionRationale {
     private final View activity;
     private final String explanation;
 
