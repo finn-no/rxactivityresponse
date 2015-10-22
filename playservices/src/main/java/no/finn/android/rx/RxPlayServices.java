@@ -18,33 +18,33 @@ import rx.Observable;
 public class RxPlayServices {
 
     @SafeVarargs
-    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxActivityResponseDelegate.RxResponseHandler responseHandler, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxResponseHandler responseHandler, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
         return getPlayServices(activity, responseHandler, null, null, services);
     }
 
     @SafeVarargs
-    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxActivityResponseDelegate.RxResponseHandler responseHandler, String[] permissions, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxResponseHandler responseHandler, String[] permissions, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
         return getPlayServices(activity, responseHandler, permissions, null, services);
     }
 
     @SafeVarargs
-    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxActivityResponseDelegate.RxResponseHandler responseHandler, String[] permissions, Scope[] scopes, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxResponseHandler responseHandler, String[] permissions, Scope[] scopes, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
         return RxPermission.getPermission(activity, responseHandler, permissions)
                 .lift(new PlayServicesPermissionsConnectionOperator(activity, responseHandler, scopes, services));
     }
 
     @SafeVarargs
-    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxActivityResponseDelegate.RxResponseHandler responseHandler, Scope[] scopes, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxResponseHandler responseHandler, Scope[] scopes, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
         return Observable.just(true)
                 .lift(new PlayServicesPermissionsConnectionOperator(activity, responseHandler, scopes, services));
     }
 
 
-    public static Observable<Location> getLocation(final Activity activity, final LocationRequest locationRequest, final RxActivityResponseDelegate.RxResponseHandler responseHandler) {
+    public static Observable<Location> getLocation(final Activity activity, final LocationRequest locationRequest, final RxResponseHandler responseHandler) {
         return getLocation(activity, null, locationRequest, responseHandler);
     }
 
-    public static Observable<Location> getLocation(final Activity activity, RxPermissionRationale rationaleOperator, final LocationRequest locationRequest, final RxActivityResponseDelegate.RxResponseHandler responseHandler) {
+    public static Observable<Location> getLocation(final Activity activity, RxPermissionRationale rationaleOperator, final LocationRequest locationRequest, final RxResponseHandler responseHandler) {
         String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
         return RxPermission.getPermission(activity, responseHandler, rationaleOperator, permissions)
                 .lift(new PlayServicesPermissionsConnectionOperator(activity, responseHandler, LocationServices.API))

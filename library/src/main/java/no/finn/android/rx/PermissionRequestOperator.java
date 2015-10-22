@@ -8,11 +8,11 @@ import rx.Subscriber;
 
 public class PermissionRequestOperator implements Observable.Operator<Boolean, RxPermission.RxPermissionResult> {
     private final Activity activity;
-    private final RxActivityResponseDelegate.RxResponseHandler handler;
+    private final RxResponseHandler handler;
     private final RxPermissionRationale permissionRationale;
     private final String[] permissions;
 
-    public PermissionRequestOperator(Activity activity, RxActivityResponseDelegate.RxResponseHandler handler, RxPermissionRationale permissionRationale, final String... permissions) {
+    public PermissionRequestOperator(Activity activity, RxResponseHandler handler, RxPermissionRationale permissionRationale, final String... permissions) {
         this.activity = activity;
         this.handler = handler;
         this.permissionRationale = permissionRationale;

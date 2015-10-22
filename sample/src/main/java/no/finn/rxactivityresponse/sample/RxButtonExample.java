@@ -10,8 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import no.finn.android.rx.RxActivityResponseDelegate;
 import no.finn.android.rx.RxPermission;
+import no.finn.android.rx.RxResponseHandler;
 
 import rx.functions.Action1;
 
@@ -41,14 +41,12 @@ public class RxButtonExample extends Button implements View.OnClickListener {
 
     // This class handles restarting the permission request when a permission is retrieved. Since this class can be serialized
     // we could also pass extra arguments through here and back to the getLocation function.
-    private static class ResponseHandler extends RxActivityResponseDelegate.RxResponseHandler implements Parcelable {
+    private static class ResponseHandler extends RxResponseHandler implements Parcelable {
         @Override
-        public void onRequestPermissionsResult(Activity activity, String[] permissions, int[] grantResults) {
-            super.onRequestPermissionsResult(activity, permissions, grantResults);
-            if (RxPermission.allPermissionsGranted(grantResults)) {
+        public void onResponse(Activity activity, boolean success, Response response) {
+            if (success) {
                 ((RxButtonExample) activity.findViewById(R.id.getlocationpermission)).getLocation();
             }
-            // optionally you can handle a "permission denied" scenario here.
         }
 
         @Override
