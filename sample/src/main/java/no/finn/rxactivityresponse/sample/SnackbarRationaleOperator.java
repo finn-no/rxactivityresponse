@@ -15,12 +15,12 @@ public class SnackbarRationaleOperator implements RxPermissionRationale {
     }
 
     @Override
-    public void showRationale(final Runnable requestPermission) {
+    public void showRationale(final RequestPermission requestPermission) {
         Snackbar.make(activity, explanation, Snackbar.LENGTH_INDEFINITE)
                 .setAction(android.R.string.ok, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        requestPermission.run();
+                        requestPermission.execute();
                     }
                 }).show();
     }

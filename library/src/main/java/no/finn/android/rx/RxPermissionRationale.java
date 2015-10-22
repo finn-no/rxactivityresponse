@@ -1,5 +1,9 @@
 package no.finn.android.rx;
 
 public interface RxPermissionRationale {
-    void showRationale(Runnable requestPermission);
+    void showRationale(RequestPermission requestPermission);
+
+    interface RequestPermission {
+        void execute();
+    }
 }

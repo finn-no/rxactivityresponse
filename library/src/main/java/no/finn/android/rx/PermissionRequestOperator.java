@@ -12,17 +12,12 @@ public class PermissionRequestOperator implements Observable.Operator<Boolean, R
     private final RxPermissionRationale permissionRationale;
     private final String[] permissions;
 
+
     public PermissionRequestOperator(Activity activity, RxResponseHandler handler, RxPermissionRationale permissionRationale, final String... permissions) {
         this.activity = activity;
         this.handler = handler;
         this.permissionRationale = permissionRationale;
         this.permissions = permissions;
-    }
-
-    public void requestPermission() {
-        RxActivityResponseDelegate rxActivityResponseDelegate = RxActivityResponseDelegate.get(activity);
-        rxActivityResponseDelegate.setResponse(handler);
-        ActivityCompat.requestPermissions(activity, permissions, rxActivityResponseDelegate.getRequestCode());
     }
 
     @Override
@@ -45,14 +40,10 @@ public class PermissionRequestOperator implements Observable.Operator<Boolean, R
                 } else {
                     try {
                         if (rxPermissionResult.showRationale && permissionRationale != null) {
-                            permissionRationale.showRationale(new Runnable() {
-                                @Override
-                                public void run() {
-                                    requestPermission();
-                                }
-                            });
+
+                            permissionRationale.showRationale(requestPermissionHandler);
                         } else {
-                            requestPermission();
+                            requestPermissionHandler.execute();
                         }
                     } catch (Exception e) {
                         subscriber.onError(e);
@@ -63,5 +54,14 @@ public class PermissionRequestOperator implements Observable.Operator<Boolean, R
         subscriber.add(s);
         return s;
     }
+
+    private final RxPermissionRationale.RequestPermission requestPermissionHandler = new RxPermissionRationale.RequestPermission() {
+        @Override
+        public void execute() {
+            RxActivityResponseDelegate rxActivityResponseDelegate = RxActivityResponseDelegate.get(activity);
+            rxActivityResponseDelegate.setResponse(handler);
+            ActivityCompat.requestPermissions(activity, permissions, rxActivityResponseDelegate.getRequestCode());
+        }
+    };
 
 }
