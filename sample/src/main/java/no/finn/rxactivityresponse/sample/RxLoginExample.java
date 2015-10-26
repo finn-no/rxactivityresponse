@@ -1,13 +1,9 @@
 package no.finn.rxactivityresponse.sample;
 
-import java.io.IOException;
-
 import android.Manifest;
 import android.accounts.Account;
 import android.app.Activity;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -15,22 +11,24 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import no.finn.android.rx.PlayServicesPermissionsConnectionOperator;
+import no.finn.android.rx.PlayServicesBaseObservable;
 import no.finn.android.rx.RxActivityResponseDelegate;
 import no.finn.android.rx.RxPermission;
 import no.finn.android.rx.RxResponseHandler;
 
-import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class RxLoginExample extends Button implements View.OnClickListener {
@@ -42,65 +40,49 @@ public class RxLoginExample extends Button implements View.OnClickListener {
         setOnClickListener(this);
     }
 
-    private static class GoogleLoginTransformer implements Observable.Transformer<GoogleApiClient, String> {
-        private static Handler handler = new Handler(Looper.getMainLooper());
-        private final Activity activity;
-        private final ResponseHandler responseHandler;
-
-        public GoogleLoginTransformer(Activity activity, ResponseHandler responseHandler) {
-            this.activity = activity;
-            this.responseHandler = responseHandler;
+    private static class GoogleLoginObserver extends PlayServicesBaseObservable<String> {
+        @SafeVarargs
+        public GoogleLoginObserver(Activity activity, RxResponseHandler responseHandler, Scope[] scopes, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+            super(activity, responseHandler, scopes, services);
         }
 
         @Override
-        public Observable<String> call(Observable<GoogleApiClient> o) {
-            return o.observeOn(Schedulers.io())
-                    .lift(new Observable.Operator<String, GoogleApiClient>() {
-                              @Override
-                              public Subscriber<? super GoogleApiClient> call(final Subscriber<? super String> subscriber) {
-                                  final Subscriber<GoogleApiClient> s = new Subscriber<GoogleApiClient>() {
-                                      @Override
-                                      public void onCompleted() {
-                                          subscriber.onCompleted();
-                                      }
-
-                                      @Override
-                                      public void onError(Throwable throwable) {
-                                          subscriber.onError(throwable);
-                                      }
-
-                                      @Override
-                                      public void onNext(GoogleApiClient client) {
-                                          String accountName = Plus.AccountApi.getAccountName(client);
-                                          Account account = new Account(accountName, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
-                                          String scopes = "oauth2:" + GOOGLE_PLUS_SCOPES;
-                                          try {
-                                              subscriber.onNext(GoogleAuthUtil.getToken(activity.getApplicationContext(), account, scopes));
-                                              subscriber.onCompleted();
-                                          } catch (IOException e) {
-                                              subscriber.onError(e);
-                                          } catch (final UserRecoverableAuthException e) {
-                                              handler.post(new Runnable() {
-                                                  @Override
-                                                  public void run() {
-                                                      RxActivityResponseDelegate rxActivityResponseDelegate = RxActivityResponseDelegate.get(activity);
-                                                      if (!rxActivityResponseDelegate.hasActiveResponse()) {
-                                                          rxActivityResponseDelegate.setResponse(responseHandler);
-                                                          activity.startActivityForResult(e.getIntent(), rxActivityResponseDelegate.getRequestCode());
-                                                      }
-                                                  }
-                                              });
-                                              subscriber.onCompleted();
-                                          } catch (final GoogleAuthException e) {
-                                              subscriber.onError(e);
-                                          }
-                                      }
-                                  };
-                                  subscriber.add(s);
-                                  return s;
-                              }
-                          }
-                    ).observeOn(AndroidSchedulers.mainThread());
+        public void onGoogleApiClientReady(final Subscriber<? super String> subscriber, final GoogleApiClient client) {
+            final Subscription s = Observable.create(new Observable.OnSubscribe<String>() {
+                @Override
+                public void call(Subscriber<? super String> subscriber) {
+                    String accountName = Plus.AccountApi.getAccountName(client);
+                    Account account = new Account(accountName, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
+                    String scopes = "oauth2:" + GOOGLE_PLUS_SCOPES;
+                    try {
+                        subscriber.onNext(GoogleAuthUtil.getToken(activity.getApplicationContext(), account, scopes));
+                        subscriber.onCompleted();
+                    } catch (Exception e) {
+                        subscriber.onError(e);
+                    }
+                }
+            }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Action1<String>() {
+                        @Override
+                        public void call(String s) {
+                            subscriber.onNext(s);
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            if (throwable instanceof UserRecoverableAuthException) {
+                                RxActivityResponseDelegate rxActivityResponseDelegate = RxActivityResponseDelegate.get(activity);
+                                if (!rxActivityResponseDelegate.hasActiveResponse()) {
+                                    rxActivityResponseDelegate.setResponse(responseHandler);
+                                    activity.startActivityForResult(((UserRecoverableAuthException) throwable).getIntent(), rxActivityResponseDelegate.getRequestCode());
+                                }
+                                subscriber.onCompleted();
+                            } else {
+                                subscriber.onError(throwable);
+                            }
+                        }
+                    });
+            subscriber.add(s);
         }
     }
 
@@ -122,8 +104,16 @@ public class RxLoginExample extends Button implements View.OnClickListener {
         });*/
 
         RxPermission.getPermission(activity, responseHandler, rationaleOperator, permissions)
-                .lift(new PlayServicesPermissionsConnectionOperator(activity, responseHandler, scopes, Plus.API))
-                .compose(new GoogleLoginTransformer((Activity) getContext(), responseHandler))
+                .flatMap(new Func1<Boolean, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(Boolean granted) {
+                        if (granted) {
+                            return Observable.create(new GoogleLoginObserver(activity, responseHandler, scopes, Plus.API))
+                                    .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread());
+                        }
+                        return Observable.empty();
+                    }
+                })
                 .subscribe(new Action1<String>() {
                                @Override
                                public void call(String s) {

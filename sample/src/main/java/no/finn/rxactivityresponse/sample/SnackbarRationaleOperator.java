@@ -20,7 +20,7 @@ public class SnackbarRationaleOperator extends RxPermissionRationale {
         snackbar = Snackbar.make(activity, explanation, Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestPermission.execute();
+                requestPermission.showRationale();
             }
         });
         snackbar.show();
