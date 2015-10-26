@@ -18,6 +18,6 @@ public abstract class RxPermissionRationale {
     }
 
     public interface RequestPermission {
-        void execute();
+        void showRationale();
     }
 }

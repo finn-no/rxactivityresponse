@@ -5,29 +5,17 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <no.finn.rxactivityresponse.sample.RxButtonExample
-            android:id="@+id/getlocationpermission"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Get location"/>
-
-    <no.finn.rxactivityresponse.sample.RxButtonExampleWithRationale
+     <no.finn.rxactivityresponse.sample.RxButtonExampleWithRationale
             android:id="@+id/getlocationbuttonwithrationale"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Get location with rationale"/>
+            android:text="Get permission with rationale"/>
 
-    <no.finn.rxactivityresponse.sample.RxPlayServicesLocationExample
-            android:id="@+id/getlocation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Get location with play services settings++"/>
-
-    <no.finn.rxactivityresponse.sample.RxPlayServicesLocationWithRationaleExample
+     <no.finn.rxactivityresponse.sample.RxPlayServicesLocationWithRationaleExample
             android:id="@+id/getlocationwithrationale"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Get location with play services settings with rationale - full test"/>
+            android:text="Get location + (enabling locationsettings and permissions) + rationale"/>
 
 
     <no.finn.rxactivityresponse.sample.RxLoginExample

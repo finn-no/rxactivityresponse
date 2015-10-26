@@ -26,7 +26,10 @@ public class RxButtonExampleWithRationale extends Button implements View.OnClick
 
     public void getLocation() {
         final String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+
+        // Rationale is optional.
         RxPermissionRationale rationaleOperator = new SnackbarRationaleOperator(this, "I need access to ...");
+
         RxPermission.getPermission((Activity) getContext(), locationResponseHandler, rationaleOperator, permissions)
                 .subscribe(new Action1<Boolean>() {
                     @Override

@@ -2,6 +2,7 @@ package no.finn.android.rx;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 
 public abstract class RxResponseHandler {
     public void onActivityResult(Activity activity, int resultCode, Intent data) {
@@ -9,7 +10,7 @@ public abstract class RxResponseHandler {
     }
 
     public void onRequestPermissionsResult(Activity activity, String[] permissions, int[] grantResults) {
-        onResponse(activity, RxPermission.allPermissionsGranted(grantResults), new Response(new PermissionResponse(permissions, grantResults)));
+        onResponse(activity, allPermissionsGranted(grantResults), new Response(new PermissionResponse(permissions, grantResults)));
     }
 
     public abstract void onResponse(Activity activity, boolean success, Response response);
@@ -47,5 +48,14 @@ public abstract class RxResponseHandler {
             this.activityResponse = activityResponse;
             permissionResponse = null;
         }
+    }
+
+    private static boolean allPermissionsGranted(int[] grantResults) {
+        for (int grantResult : grantResults) {
+            if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
     }
 }
