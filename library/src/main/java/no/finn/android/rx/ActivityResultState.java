@@ -4,11 +4,11 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class OnActivityResult implements Parcelable {
+public class ActivityResultState implements Parcelable {
     public final int resultCode;
     public final Intent data;
 
-    public OnActivityResult(int resultCode, Intent data) {
+    public ActivityResultState(int resultCode, Intent data) {
         this.resultCode = resultCode;
         this.data = data;
     }
@@ -24,14 +24,14 @@ public class OnActivityResult implements Parcelable {
         dest.writeParcelable(data, 0);
     }
 
-    public static final Creator<OnActivityResult> CREATOR = new Creator<OnActivityResult>() {
-        public OnActivityResult createFromParcel(Parcel in) {
+    public static final Creator<ActivityResultState> CREATOR = new Creator<ActivityResultState>() {
+        public ActivityResultState createFromParcel(Parcel in) {
             final Intent parcelable = in.readParcelable(Intent.class.getClassLoader());
-            return new OnActivityResult(in.readInt(), parcelable);
+            return new ActivityResultState(in.readInt(), parcelable);
         }
 
-        public OnActivityResult[] newArray(int size) {
-            return new OnActivityResult[size];
+        public ActivityResultState[] newArray(int size) {
+            return new ActivityResultState[size];
         }
     };
 }

@@ -13,8 +13,8 @@ public class RxState implements Parcelable {
 
     public final int requestCode;
     private String currentRequest = null;
-    private final HashMap<String, OnRequestPermissionResult> permissionResults;
-    private final HashMap<String, OnActivityResult> activityResults;
+    private final HashMap<String, RequestPermissionState> permissionResults;
+    private final HashMap<String, ActivityResultState> activityResults;
 
     RxState(int requestCode) {
         this.requestCode = requestCode;
@@ -47,22 +47,22 @@ public class RxState implements Parcelable {
         this.activityResults = activityResults;
     }
 
-    public OnRequestPermissionResult getPermissionResult(String name) {
+    public RequestPermissionState getPermissionResult(String name) {
         return permissionResults.get(name);
     }
 
-    public OnActivityResult getActivityResult(String name) {
+    public ActivityResultState getActivityResult(String name) {
         return activityResults.get(name);
     }
 
     public void onRequestPermissionsResult(String[] permissions, int[] grantResults) {
-        permissionResults.put(currentRequest, new OnRequestPermissionResult(permissions, grantResults));
+        permissionResults.put(currentRequest, new RequestPermissionState(permissions, grantResults));
         rxContinueAction(requestCode);
         currentRequest = null;
     }
 
     public void onActivityResult(int resultCode, Intent data) {
-        activityResults.put(currentRequest, new OnActivityResult(resultCode, data));
+        activityResults.put(currentRequest, new ActivityResultState(resultCode, data));
         rxContinueAction(requestCode);
         currentRequest = null;
     }
@@ -101,7 +101,7 @@ public class RxState implements Parcelable {
     public static final Creator<RxState> CREATOR = new Creator<RxState>() {
         public RxState createFromParcel(Parcel in) {
             return new RxState(in.readInt(), in.readString(),
-                    in.readHashMap(OnRequestPermissionResult.class.getClassLoader()), in.readHashMap(OnActivityResult.class.getClassLoader()));
+                    in.readHashMap(RequestPermissionState.class.getClassLoader()), in.readHashMap(ActivityResultState.class.getClassLoader()));
         }
 
         public RxState[] newArray(int size) {

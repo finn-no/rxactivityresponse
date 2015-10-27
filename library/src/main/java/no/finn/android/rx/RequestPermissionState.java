@@ -4,11 +4,11 @@ import android.content.pm.PackageManager;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class OnRequestPermissionResult implements Parcelable {
+public class RequestPermissionState implements Parcelable {
     public final String[] permissions;
     public final int[] grantResults;
 
-    public OnRequestPermissionResult(String[] permissions, int[] grantResults) {
+    public RequestPermissionState(String[] permissions, int[] grantResults) {
         this.permissions = permissions;
         this.grantResults = grantResults;
     }
@@ -33,13 +33,13 @@ public class OnRequestPermissionResult implements Parcelable {
         dest.writeIntArray(grantResults);
     }
 
-    public static final Creator<OnRequestPermissionResult> CREATOR = new Creator<OnRequestPermissionResult>() {
-        public OnRequestPermissionResult createFromParcel(Parcel in) {
-            return new OnRequestPermissionResult(in.createStringArray(), in.createIntArray());
+    public static final Creator<RequestPermissionState> CREATOR = new Creator<RequestPermissionState>() {
+        public RequestPermissionState createFromParcel(Parcel in) {
+            return new RequestPermissionState(in.createStringArray(), in.createIntArray());
         }
 
-        public OnRequestPermissionResult[] newArray(int size) {
-            return new OnRequestPermissionResult[size];
+        public RequestPermissionState[] newArray(int size) {
+            return new RequestPermissionState[size];
         }
     };
 }

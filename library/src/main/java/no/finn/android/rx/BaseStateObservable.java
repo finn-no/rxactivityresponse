@@ -23,21 +23,21 @@ public abstract class BaseStateObservable<T> implements Observable.OnSubscribe<T
         return state.requestCode;
     }
 
-    public OnRequestPermissionResult getPermissionResult() {
+    public RequestPermissionState getPermissionResult() {
         return state.getPermissionResult(getStateName());
     }
 
     public boolean permissionRequestDenied() {
-        final OnRequestPermissionResult result = getPermissionResult();
+        final RequestPermissionState result = getPermissionResult();
         return result != null && !result.permissionsGranted();
     }
 
-    public OnActivityResult getActivityResult() {
+    public ActivityResultState getActivityResult() {
         return state.getActivityResult(getStateName());
     }
 
     public boolean activityResultCanceled() {
-        final OnActivityResult activityResult = getActivityResult();
+        final ActivityResultState activityResult = getActivityResult();
         return activityResult != null && activityResult.resultCode == Activity.RESULT_CANCELED;
     }
 }
