@@ -24,12 +24,10 @@ public class RxState implements Parcelable {
 
     public static RxState get(Context context, int requestCode, WeakReference<RxStateRestart> rxContinueRef) {
         final RxActivityStateDelegate delegate = RxActivityStateDelegate.get(context);
-
-        //@fixme : dont access delegate.resultTracking directly.
-        RxState result = delegate.resultTracking.get(requestCode);
+        RxState result = delegate.getState(requestCode);
         if (result == null) {
             result = new RxState(requestCode);
-            delegate.resultTracking.put(requestCode, result);
+            delegate.putState(requestCode, result);
         }
         return result.withContinue(rxContinueRef);
     }

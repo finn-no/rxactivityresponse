@@ -7,8 +7,7 @@ import android.util.SparseArray;
 
 public class RxActivityStateDelegate {
     private static final String SYSTEMSERVICE_NAME = "PersistedActivityResult";
-
-    SparseArray<RxState> resultTracking = new SparseArray<>();
+    private SparseArray<RxState> state = new SparseArray<>();
 
     @SuppressWarnings("ResourceType")
     public static RxActivityStateDelegate get(Context context) {
@@ -24,26 +23,33 @@ public class RxActivityStateDelegate {
 
     public void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            resultTracking = savedInstanceState.getSparseParcelableArray("RESULTS");
+            state = savedInstanceState.getSparseParcelableArray("RESULTS");
         }
     }
 
     public void onSaveInstanceState(Bundle outState) {
-        outState.putSparseParcelableArray("RESULTS", resultTracking);
+        outState.putSparseParcelableArray("RESULTS", state);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        final RxState activityResult = resultTracking.get(requestCode);
+        final RxState activityResult = state.get(requestCode);
         if (activityResult != null) {
             activityResult.onActivityResult(resultCode, data);
         }
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        final RxState activityResult = resultTracking.get(requestCode);
+        final RxState activityResult = state.get(requestCode);
         if (activityResult != null) {
             activityResult.onRequestPermissionsResult(permissions, grantResults);
         }
     }
 
+    RxState getState(int requestCode) {
+        return state.get(requestCode);
+    }
+
+    void putState(int requestCode, RxState result) {
+        state.put(requestCode, result);
+    }
 }
