@@ -52,11 +52,6 @@ public class RxActivityResponseDelegate {
         this.currentResponseHandler = rxResponseHandler;
     }
 
-    public void onSaveInstanceState(Bundle outState) {
-        if (currentResponseHandler != null) {
-            serializer.serialize(outState, currentResponseHandler);
-        }
-    }
 
     public RxActivityResponseDelegate getSystemService(String name) {
         if (SYSTEMSERVICE_NAME.equals(name)) {
@@ -79,9 +74,18 @@ public class RxActivityResponseDelegate {
         }
     }
 
+    public interface RxContinue {
+        void rxAction(int requestCode);
+    }
 
     public void onCreate(Bundle savedInstanceState) {
         currentResponseHandler = serializer.deserialize(savedInstanceState);
+    }
+
+    public void onSaveInstanceState(Bundle outState) {
+        if (currentResponseHandler != null) {
+            serializer.serialize(outState, currentResponseHandler);
+        }
     }
 
     public interface BundleSerializer {

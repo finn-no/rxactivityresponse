@@ -1,7 +1,7 @@
 package no.finn.android.rx;
 
 public abstract class RxPermissionRationale {
-    final boolean alwaysShowRationale;
+    public final boolean alwaysShowRationale;
 
     public RxPermissionRationale() {
         this(false);
@@ -18,6 +18,6 @@ public abstract class RxPermissionRationale {
     }
 
     public interface RequestPermission {
-        void showRationale();
+        void requestPermission();
     }
 }

@@ -5,7 +5,7 @@ import android.app.Activity;
 import rx.Observable;
 
 public class RxPermission {
-    public static Observable<RxPermissionResult> getPermissionStatus(final Activity activity, final String... permissions) {
+    public static Observable<PermissionResult> getPermissionStatus(final Activity activity, final String... permissions) {
         return Observable.create(new PermissionStatusObservable(activity, permissions));
     }
 

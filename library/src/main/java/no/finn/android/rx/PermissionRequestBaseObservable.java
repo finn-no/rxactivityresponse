@@ -41,7 +41,7 @@ public abstract class PermissionRequestBaseObservable<T> extends PermissionStatu
                     rationaleDialogActive = true;
                     permissionRationale.showRationale(PermissionRequestBaseObservable.this);
                 } else {
-                    showRationale();
+                    requestPermission();
                 }
             } catch (Exception e) {
                 subscriber.onError(e);
@@ -52,10 +52,11 @@ public abstract class PermissionRequestBaseObservable<T> extends PermissionStatu
     public abstract void onPermissionsGranted(Subscriber<? super T> subscriber);
 
     @Override
-    public void showRationale() {
+    public void requestPermission() {
         rationaleDialogActive = false;
         RxActivityResponseDelegate rxActivityResponseDelegate = RxActivityResponseDelegate.get(activity);
         rxActivityResponseDelegate.setResponse(handler);
         ActivityCompat.requestPermissions(activity, permissions, rxActivityResponseDelegate.getRequestCode());
     }
 }
+
