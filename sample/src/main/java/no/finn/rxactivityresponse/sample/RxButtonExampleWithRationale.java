@@ -6,7 +6,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -24,7 +23,6 @@ public class RxButtonExampleWithRationale extends Button implements View.OnClick
 
     public RxButtonExampleWithRationale(Context context, AttributeSet attrs) {
         super(context, attrs);
-        Log.d("DBG", "RxButtonExampleWithRationale.RxButtonExampleWithRationale CONSTRUCTION TIME Time:" + System.currentTimeMillis());
         rxState = RxState.get(context, ActivityResponses.GET_LOCATIONPERMISSION, new WeakReference<RxStateRestart>(this));
         setOnClickListener(this);
     }
@@ -38,7 +36,6 @@ public class RxButtonExampleWithRationale extends Button implements View.OnClick
     public void rxAction(int requestCode) {
         Assert.assertEquals(requestCode, ActivityResponses.GET_LOCATIONPERMISSION);
         RxPermissionRationale rationaleOperator = new SnackbarRationaleOperator(this, "I need access to ...");
-        Log.d("DBG", "RxButtonExampleWithRationale.startRequest " + rxState + " Time:" + System.currentTimeMillis());
 
         final String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
         RxPermission.getPermission((Activity) getContext(), rxState, rationaleOperator, permissions)

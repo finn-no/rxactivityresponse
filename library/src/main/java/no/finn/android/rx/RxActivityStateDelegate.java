@@ -3,7 +3,6 @@ package no.finn.android.rx;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseArray;
 
 public class RxActivityStateDelegate {
@@ -36,7 +35,6 @@ public class RxActivityStateDelegate {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("DBG", "PersistedActivityResultActivityDelegate.onActivityResult " + requestCode + " " + resultCode + " Time:" + System.currentTimeMillis());
         final RxState activityResult = resultTracking.get(requestCode);
         if (activityResult != null) {
             activityResult.onActivityResult(resultCode, data);
@@ -44,7 +42,6 @@ public class RxActivityStateDelegate {
     }
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        Log.d("DBG", "PersistedActivityResultActivityDelegate.onRequestPermissionsResult onRequestPermissionsResult " + requestCode + " Time:" + System.currentTimeMillis());
         final RxState activityResult = resultTracking.get(requestCode);
         if (activityResult != null) {
             activityResult.onRequestPermissionsResult(permissions, grantResults);

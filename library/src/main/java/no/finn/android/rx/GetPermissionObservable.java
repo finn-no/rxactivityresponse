@@ -2,7 +2,6 @@ package no.finn.android.rx;
 
 import android.app.Activity;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 
 import rx.Subscriber;
 import rx.functions.Action0;
@@ -40,7 +39,6 @@ public class GetPermissionObservable extends BaseStateObservable<Boolean> implem
     }
 
     public void onPermissionResult(Subscriber<? super Boolean> subscriber, boolean allPermissionsGranted, boolean showRationale) {
-        Log.d("DBG", "RXCALL : NewRequestPermissionObservable.onPermissionResult " + allPermissionsGranted + " Time:" + System.currentTimeMillis());
         if (allPermissionsGranted) {
             subscriber.onNext(true);
             subscriber.onCompleted();
@@ -71,7 +69,6 @@ public class GetPermissionObservable extends BaseStateObservable<Boolean> implem
     @Override
     public void requestPermission() {
         rationaleActive = false;
-        Log.d("DBG", "NewRequestPermissionObservable.requestPermission  Time:" + System.currentTimeMillis());
         recieveStateResponse(STATE_NAME);
         ActivityCompat.requestPermissions(activity, permissions, getRequestCode());
     }
