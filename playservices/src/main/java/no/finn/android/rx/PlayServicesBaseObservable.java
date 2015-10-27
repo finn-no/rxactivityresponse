@@ -8,29 +8,28 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
-import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action0;
 import rx.subscriptions.Subscriptions;
 
 //NB : all connection responses will come back on the main thread!
-public abstract class PlayServicesBaseObservable<T> implements Observable.OnSubscribe<T> {
+public abstract class PlayServicesBaseObservable<T> extends BaseStateObservable<T> {
+    private static final String STATE_NAME = "BasePlayServices";
     public final Activity activity;
-    public final RxResponseHandler responseHandler;
     private final Scope[] scopes;
     private final Api<? extends Api.ApiOptions.NotRequiredOptions>[] services;
     private GoogleApiClient client;
 
     @SafeVarargs
-    public PlayServicesBaseObservable(Activity activity, RxResponseHandler responseHandler, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
-        this(activity, responseHandler, null, services);
+    public PlayServicesBaseObservable(Activity activity, RxState state, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+        this(activity, state, null, services);
     }
 
     @SafeVarargs
-    public PlayServicesBaseObservable(Activity activity, RxResponseHandler responseHandler, Scope[] scopes, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+    public PlayServicesBaseObservable(Activity activity, RxState state, Scope[] scopes, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+        super(state);
         this.activity = activity;
         this.scopes = scopes;
-        this.responseHandler = responseHandler;
         this.services = services;
     }
 
@@ -48,6 +47,10 @@ public abstract class PlayServicesBaseObservable<T> implements Observable.OnSubs
 
     @Override
     public void call(final Subscriber<? super T> subscriber) {
+        if (activityResultCanceled(STATE_NAME)) {
+            subscriber.onError(new PlayServicesConnectionCanceledException());
+            return;
+        }
         GoogleApiClient.Builder builder = new GoogleApiClient.Builder(activity);
         for (Api<? extends Api.ApiOptions.NotRequiredOptions> service : services) {
             builder.addApi(service);
@@ -89,14 +92,15 @@ public abstract class PlayServicesBaseObservable<T> implements Observable.OnSubs
     }
 
     protected void resolveConnectionFailed(ConnectionResult connectionResult, Subscriber<?> subscriber) {
-        RxActivityResponseDelegate rxActivityResponseDelegate = RxActivityResponseDelegate.get(activity);
-        if (!rxActivityResponseDelegate.hasActiveResponse()) {
-            rxActivityResponseDelegate.setResponse(responseHandler);
-            try {
-                connectionResult.startResolutionForResult(activity, rxActivityResponseDelegate.getRequestCode());
-            } catch (IntentSender.SendIntentException e) {
-                subscriber.onError(new GoogleApiConnectionFailed(e));
-            }
+        try {
+            recieveStateResponse(STATE_NAME);
+            connectionResult.startResolutionForResult(activity, getRequestCode());
+        } catch (IntentSender.SendIntentException e) {
+            subscriber.onError(new GoogleApiConnectionFailed(e));
         }
+    }
+
+    public static class PlayServicesConnectionCanceledException extends UserAbortedException {
+
     }
 }
