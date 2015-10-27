@@ -18,11 +18,12 @@ import no.finn.android.rx.RxStateRestart;
 import junit.framework.Assert;
 import rx.functions.Action1;
 
-public class RxButtonExampleWithRationale extends Button implements View.OnClickListener, RxStateRestart {
+public class SimplePermissionButton extends Button implements View.OnClickListener, RxStateRestart {
     private final RxState rxState;
 
-    public RxButtonExampleWithRationale(Context context, AttributeSet attrs) {
+    public SimplePermissionButton(Context context, AttributeSet attrs) {
         super(context, attrs);
+        // The State has to be created construction time (it's the only way we can get if we're serialized mid flow!)
         rxState = RxState.get(context, ActivityResponses.GET_LOCATIONPERMISSION, new WeakReference<RxStateRestart>(this));
         setOnClickListener(this);
     }

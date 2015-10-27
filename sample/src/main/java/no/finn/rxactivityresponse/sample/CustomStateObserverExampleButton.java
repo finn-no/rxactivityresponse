@@ -36,11 +36,11 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class RxLoginExample extends Button implements View.OnClickListener, RxStateRestart {
+public class CustomStateObserverExampleButton extends Button implements View.OnClickListener, RxStateRestart {
     private static final String GOOGLE_PLUS_SCOPES = Scopes.PLUS_LOGIN + " " + "email";
     private final RxState state;
 
-    public RxLoginExample(Context context, AttributeSet attrs) {
+    public CustomStateObserverExampleButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOnClickListener(this);
         state = RxState.get(context, ActivityResponses.GET_LOGINTOKEN, new WeakReference<RxStateRestart>(this));
@@ -62,6 +62,7 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
         @Override
         public void onGoogleApiClientReady(final Subscriber<? super String> subscriber, final GoogleApiClient client) {
             if (activityResultCanceled(STATE_NAME)) {
+                // always check and handle responses after recieveStateResponse
                 subscriber.onError(new GoogleLoginCanceledException());
                 return;
             }
@@ -89,6 +90,7 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
                         @Override
                         public void call(Throwable throwable) {
                             if (throwable instanceof UserRecoverableAuthException) {
+                                // always trigger recieveStateResponse before startActivityForResult (or permission...)
                                 recieveStateResponse(STATE_NAME);
                                 activity.startActivityForResult(((UserRecoverableAuthException) throwable).getIntent(), getRequestCode());
                                 subscriber.onCompleted();
@@ -130,6 +132,7 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
     }
 
     private Observable<String> getLoginToken(final Activity activity, String[] permissions, final Scope[] scopes, final SnackbarRationaleOperator rationale) {
+        // we cant use RxPermission.getPermission directly, as it triggers state.reset() mid flow.
         return Observable.create(new GetPermissionStatusObservable(activity, permissions))
                 .flatMap(new Func1<PermissionResult, Observable<Boolean>>() {
                     @Override
@@ -150,6 +153,8 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
                 .finallyDo(new Action0() {
                     @Override
                     public void call() {
+                        // on custom observable flows you need to trigger this at the end to ensure the next click actually retries the request.
+                        // otherwise you run with the previous clicks responses
                         state.reset();
                     }
                 });

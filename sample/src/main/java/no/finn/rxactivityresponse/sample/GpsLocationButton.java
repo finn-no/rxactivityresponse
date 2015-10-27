@@ -19,10 +19,10 @@ import com.google.android.gms.location.LocationRequest;
 import junit.framework.Assert;
 import rx.functions.Action1;
 
-public class RxPlayServicesLocationWithRationaleExample extends Button implements View.OnClickListener, RxStateRestart {
+public class GpsLocationButton extends Button implements View.OnClickListener, RxStateRestart {
     private final RxState rxState;
 
-    public RxPlayServicesLocationWithRationaleExample(Context context, AttributeSet attrs) {
+    public GpsLocationButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOnClickListener(this);
         rxState = RxState.get(context, ActivityResponses.GET_LOCATION, new WeakReference<RxStateRestart>(this));
@@ -41,6 +41,8 @@ public class RxPlayServicesLocationWithRationaleExample extends Button implement
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
         RxPermissionRationale rationaleOperator = new SnackbarRationaleOperator(this, "I need access to ...");
+
+        // GetLocation fetches the required permission, turns on location stuff with the locationsetting api, then recieves a location
         RxPlayServices.getLocation((Activity) getContext(), rationaleOperator, locationRequest, rxState)
                 .subscribe(new Action1<Location>() {
                     @Override
