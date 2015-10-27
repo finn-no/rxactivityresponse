@@ -1,7 +1,5 @@
 package no.finn.android.rx;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.content.IntentSender;
 
@@ -72,7 +70,7 @@ public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObse
 
     protected abstract void locationSettingSuccess(Subscriber<? super T> subscriber, GoogleApiClient client);
 
-    public static class LocationSettingDeniedException extends ActivityResultState.ActivityResultCanceledException {
+    public static class LocationSettingDeniedException extends UserAbortedException {
 
     }
 }

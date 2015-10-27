@@ -18,13 +18,7 @@ public class RxPermission {
                     public Observable<Boolean> call(PermissionResult permissionResult) {
                         return Observable.create(new GetPermissionObservable(activity, state, rationale, permissionResult));
                     }
-                })
-                .finallyDo(new Action0() {
-                    @Override
-                    public void call() {
-                        state.reset();
-                    }
-                });
+                }).compose(new BaseStateObservable.EndStateTransformer<Boolean>(state));
     }
 
     public static Observable<PermissionResult> getPermissionState(Activity activity, final String... permissions) {

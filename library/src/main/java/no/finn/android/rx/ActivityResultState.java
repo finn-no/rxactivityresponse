@@ -38,10 +38,6 @@ public class ActivityResultState implements Parcelable {
         }
     };
 
-    public static class ActivityResultCanceledException extends IOException {
-
-    }
-
     public boolean resultCanceled() {
         return resultCode == Activity.RESULT_CANCELED;
     }

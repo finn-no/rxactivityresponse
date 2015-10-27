@@ -100,7 +100,7 @@ public abstract class PlayServicesBaseObservable<T> extends BaseStateObservable<
         }
     }
 
-    public static class PlayServicesConnectionCanceledException extends ActivityResultState.ActivityResultCanceledException {
+    public static class PlayServicesConnectionCanceledException extends UserAbortedException {
 
     }
 }

@@ -11,13 +11,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import no.finn.android.rx.ActivityResultState;
+import no.finn.android.rx.BaseStateObservable;
 import no.finn.android.rx.GetPermissionObservable;
 import no.finn.android.rx.GetPermissionStatusObservable;
 import no.finn.android.rx.PermissionResult;
 import no.finn.android.rx.PlayServicesBaseObservable;
 import no.finn.android.rx.RxState;
 import no.finn.android.rx.RxStateRestart;
+import no.finn.android.rx.UserAbortedException;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -103,7 +104,7 @@ public class CustomStateObserverExampleButton extends Button implements View.OnC
         }
 
 
-        public static class GoogleLoginCanceledException extends ActivityResultState.ActivityResultCanceledException {
+        public static class GoogleLoginCanceledException extends UserAbortedException {
 
         }
     }
@@ -147,18 +148,10 @@ public class CustomStateObserverExampleButton extends Button implements View.OnC
                             return Observable.create(new GoogleLoginObservable(activity, state, scopes, Plus.API))
                                     .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread());
                         }
-                        return Observable.empty();
+                        return Observable.error(new UserAbortedException());
                     }
                 })
-                .finallyDo(new Action0() {
-                    @Override
-                    public void call() {
-                        // on custom observable flows you need to trigger this at the end to ensure the next click actually retries the request.
-                        // otherwise you run with the previous clicks responses
-                        state.reset();
-                    }
-                });
-
+                .compose(new BaseStateObservable.EndStateTransformer<String>(state));
     }
 
 
