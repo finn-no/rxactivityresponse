@@ -1,7 +1,5 @@
 package no.finn.android.rx;
 
-import android.app.Activity;
-
 import rx.Observable;
 
 public abstract class BaseStateObservable<T> implements Observable.OnSubscribe<T> {
@@ -11,33 +9,29 @@ public abstract class BaseStateObservable<T> implements Observable.OnSubscribe<T
         this.state = state;
     }
 
-    public String getStateName() {
-        return getClass().getName();
-    }
-
-    public void recieveStateResponse() {
-        state.recieve(getStateName());
+    public void recieveStateResponse(String stateName) {
+        state.recieve(stateName);
     }
 
     public int getRequestCode() {
         return state.requestCode;
     }
 
-    public RequestPermissionState getPermissionResult() {
-        return state.getPermissionResult(getStateName());
+    public RequestPermissionState getPermissionResult(String stateName) {
+        return state.getPermissionResult(stateName);
     }
 
-    public boolean permissionRequestDenied() {
-        final RequestPermissionState result = getPermissionResult();
+    public boolean permissionRequestDenied(String stateName) {
+        final RequestPermissionState result = getPermissionResult(stateName);
         return result != null && !result.permissionsGranted();
     }
 
-    public ActivityResultState getActivityResult() {
-        return state.getActivityResult(getStateName());
+    public ActivityResultState getActivityResult(String stateName) {
+        return state.getActivityResult(stateName);
     }
 
-    public boolean activityResultCanceled() {
-        final ActivityResultState activityResult = getActivityResult();
-        return activityResult != null && activityResult.resultCode == Activity.RESULT_CANCELED;
+    public boolean activityResultCanceled(String stateName) {
+        final ActivityResultState activityResult = getActivityResult(stateName);
+        return activityResult != null && activityResult.resultCanceled();
     }
 }

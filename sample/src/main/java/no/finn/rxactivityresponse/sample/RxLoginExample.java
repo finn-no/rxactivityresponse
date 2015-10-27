@@ -11,8 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import no.finn.android.rx.ActivityResultState;
+import no.finn.android.rx.GetPermissionObservable;
 import no.finn.android.rx.PlayServicesBaseObservable;
-import no.finn.android.rx.RxPermission;
 import no.finn.android.rx.RxState;
 import no.finn.android.rx.RxStateRestart;
 
@@ -28,22 +29,24 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class RxLoginExample extends Button implements View.OnClickListener, RxStateRestart {
     private static final String GOOGLE_PLUS_SCOPES = Scopes.PLUS_LOGIN + " " + "email";
-    private static final int GET_LOGIN = 42;
     private final RxState state;
 
     public RxLoginExample(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOnClickListener(this);
-        state = RxState.get(context, GET_LOGIN, new WeakReference<RxStateRestart>(this));
+        state = RxState.get(context, ActivityResponses.GET_LOGINTOKEN, new WeakReference<RxStateRestart>(this));
     }
 
     private static class GoogleLoginObservable extends PlayServicesBaseObservable<String> {
+        private static final String STATE_NAME = "GoogleLoginToken";
+
         @SafeVarargs
         public GoogleLoginObservable(Activity activity, RxState state, Scope[] scopes, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
             super(activity, state, scopes, services);
@@ -51,6 +54,10 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
 
         @Override
         public void onGoogleApiClientReady(final Subscriber<? super String> subscriber, final GoogleApiClient client) {
+            if (activityResultCanceled(STATE_NAME)) {
+                subscriber.onError(new GoogleLoginCanceledException());
+                return;
+            }
             final Subscription s = Observable.create(new Observable.OnSubscribe<String>() {
                 @Override
                 public void call(Subscriber<? super String> subscriber) {
@@ -74,7 +81,7 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
                         @Override
                         public void call(Throwable throwable) {
                             if (throwable instanceof UserRecoverableAuthException) {
-                                recieveStateResponse(); //@fixme : not handling result..
+                                recieveStateResponse(STATE_NAME);
                                 activity.startActivityForResult(((UserRecoverableAuthException) throwable).getIntent(), getRequestCode());
                                 subscriber.onCompleted();
                             } else {
@@ -84,11 +91,15 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
                     });
             subscriber.add(s);
         }
+
+        public static class GoogleLoginCanceledException extends ActivityResultState.ActivityResultCanceledException {
+
+        }
     }
 
     @Override
     public void rxAction(int requestCode) {
-        Assert.assertEquals(requestCode, GET_LOGIN);
+        Assert.assertEquals(requestCode, ActivityResponses.GET_LOGINTOKEN);
         final Activity activity = (Activity) getContext();
         String[] permissions = new String[]{Manifest.permission.GET_ACCOUNTS};
 
@@ -104,8 +115,11 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
                 client.disconnect();
             }
         });*/
+        getLoginToken(activity, permissions, scopes, rationaleOperator);
+    }
 
-        RxPermission.getPermission(activity, state, rationaleOperator, permissions)
+    private void getLoginToken(final Activity activity, String[] permissions, final Scope[] scopes, SnackbarRationaleOperator rationaleOperator) {
+        Observable.create(new GetPermissionObservable(activity, state, rationaleOperator, permissions))
                 .flatMap(new Func1<Boolean, Observable<String>>() {
                     @Override
                     public Observable<String> call(Boolean granted) {
@@ -116,18 +130,28 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
                         return Observable.empty();
                     }
                 })
+                .finallyDo(new Action0() {
+                    @Override
+                    public void call() {
+                        state.reset();
+                    }
+                })
                 .subscribe(new Action1<String>() {
-                               @Override
-                               public void call(String s) {
-                                   Toast.makeText(getContext(), "Token is : " + s, Toast.LENGTH_SHORT).show();
-                               }
-                           }
-                );
+                    @Override
+                    public void call(String s) {
+                        Toast.makeText(getContext(), "Token is : " + s, Toast.LENGTH_SHORT).show();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Toast.makeText(getContext(), "Exception : " + throwable, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
 
     @Override
     public void onClick(View v) {
-        rxAction(GET_LOGIN);
+        rxAction(ActivityResponses.GET_LOGINTOKEN);
     }
 }

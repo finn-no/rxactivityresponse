@@ -20,24 +20,23 @@ import junit.framework.Assert;
 import rx.functions.Action1;
 
 public class RxButtonExampleWithRationale extends Button implements View.OnClickListener, RxStateRestart {
-    private static final int GET_LOCATION = 42;
     private final RxState rxState;
 
     public RxButtonExampleWithRationale(Context context, AttributeSet attrs) {
         super(context, attrs);
         Log.d("DBG", "RxButtonExampleWithRationale.RxButtonExampleWithRationale CONSTRUCTION TIME Time:" + System.currentTimeMillis());
-        rxState = RxState.get(context, GET_LOCATION, new WeakReference<RxStateRestart>(this));
+        rxState = RxState.get(context, ActivityResponses.GET_LOCATIONPERMISSION, new WeakReference<RxStateRestart>(this));
         setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        rxAction(GET_LOCATION);
+        rxAction(ActivityResponses.GET_LOCATIONPERMISSION);
     }
 
     @Override
     public void rxAction(int requestCode) {
-        Assert.assertEquals(requestCode, GET_LOCATION);
+        Assert.assertEquals(requestCode, ActivityResponses.GET_LOCATIONPERMISSION);
         RxPermissionRationale rationaleOperator = new SnackbarRationaleOperator(this, "I need access to ...");
         Log.d("DBG", "RxButtonExampleWithRationale.startRequest " + rxState + " Time:" + System.currentTimeMillis());
 
@@ -47,6 +46,11 @@ public class RxButtonExampleWithRationale extends Button implements View.OnClick
                     @Override
                     public void call(Boolean granted) {
                         Toast.makeText(getContext(), "Permission : " + granted, Toast.LENGTH_SHORT).show();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Toast.makeText(getContext(), "Exception : " + throwable, Toast.LENGTH_SHORT).show();
                     }
                 });
     }

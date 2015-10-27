@@ -14,23 +14,13 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import rx.Observable;
+import rx.functions.Action0;
 import rx.functions.Func1;
 
 public class RxPlayServices {
-
     @SafeVarargs
-    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxState state, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
-        return getPlayServices(activity, state, null, null, services);
-    }
-
-    @SafeVarargs
-    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxState state, String[] permissions, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
-        return getPlayServices(activity, state, permissions, null, services);
-    }
-
-    @SafeVarargs
-    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxState state, String[] permissions, final Scope[] scopes, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
-        return RxPermission.getPermission(activity, state, permissions)
+    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxState state, String[] permissions, RxPermissionRationale rationale, final Scope[] scopes, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+        return resetState(Observable.create(new GetPermissionObservable(activity, state, rationale, permissions))
                 .flatMap(new Func1<Boolean, Observable<GoogleApiClient>>() {
                     @Override
                     public Observable<GoogleApiClient> call(Boolean granted) {
@@ -39,22 +29,12 @@ public class RxPlayServices {
                         }
                         return Observable.empty();
                     }
-                });
+                }), state);
     }
 
-    @SafeVarargs
-    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxState state, Scope[] scopes, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
-        return Observable.create(new PlayServicesObservable(activity, state, scopes, services));
-    }
-
-
-    public static Observable<Location> getLocation(final Activity activity, final LocationRequest locationRequest, final RxState state) {
-        return getLocation(activity, null, locationRequest, state);
-    }
-
-    public static Observable<Location> getLocation(final Activity activity, RxPermissionRationale rationaleOperator, final LocationRequest locationRequest, final RxState state) {
+    public static Observable<Location> getLocation(final Activity activity, RxPermissionRationale rationale, final LocationRequest locationRequest, final RxState state) {
         String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
-        return RxPermission.getPermission(activity, state, rationaleOperator, permissions)
+        return resetState(Observable.create(new GetPermissionObservable(activity, state, rationale, permissions))
                 .flatMap(new Func1<Boolean, Observable<Location>>() {
                     @Override
                     public Observable<Location> call(Boolean granted) {
@@ -63,7 +43,16 @@ public class RxPlayServices {
                         }
                         return Observable.empty();
                     }
-                });
+                }), state);
+    }
+
+    private static <T> Observable<T> resetState(Observable<T> observable, final RxState state) {
+        return observable.finallyDo(new Action0() {
+            @Override
+            public void call() {
+                state.reset();
+            }
+        });
     }
 
     public static class RxLocationError extends IOException {

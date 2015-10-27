@@ -1,5 +1,7 @@
 package no.finn.android.rx;
 
+import java.io.IOException;
+
 import android.app.Activity;
 import android.content.IntentSender;
 
@@ -16,6 +18,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import rx.Subscriber;
 
 public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObservable<T> {
+    private static final String STATE_NAME = "LocationSettings";
     public final LocationRequest locationRequest;
 
     public LocationSettingsObservable(Activity activity, RxState state, LocationRequest locationRequest, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
@@ -29,7 +32,10 @@ public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObse
     }
 
     private void handleLocationSettings(final Subscriber<? super T> subscriber, final GoogleApiClient client) {
-        //@fixme : handle state, also state with our parent is a bit .. fishy :/
+        if (activityResultCanceled(STATE_NAME)) {
+            subscriber.onError(new LocationSettingDeniedException());
+            return;
+        }
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .setAlwaysShow(true)
                 .addLocationRequest(locationRequest);
@@ -56,7 +62,7 @@ public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObse
     }
 
     protected void resolveResolutionRequired(Subscriber<? super T> subscriber, Status status) {
-        recieveStateResponse();
+        recieveStateResponse(STATE_NAME);
         try {
             status.startResolutionForResult(activity, getRequestCode());
         } catch (IntentSender.SendIntentException e) {
@@ -65,4 +71,8 @@ public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObse
     }
 
     protected abstract void locationSettingSuccess(Subscriber<? super T> subscriber, GoogleApiClient client);
+
+    public static class LocationSettingDeniedException extends ActivityResultState.ActivityResultCanceledException {
+
+    }
 }

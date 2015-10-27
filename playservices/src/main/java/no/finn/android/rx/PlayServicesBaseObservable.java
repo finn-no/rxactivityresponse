@@ -14,6 +14,7 @@ import rx.subscriptions.Subscriptions;
 
 //NB : all connection responses will come back on the main thread!
 public abstract class PlayServicesBaseObservable<T> extends BaseStateObservable<T> {
+    private static final String STATE_NAME = "BasePlayServices";
     public final Activity activity;
     private final Scope[] scopes;
     private final Api<? extends Api.ApiOptions.NotRequiredOptions>[] services;
@@ -46,8 +47,8 @@ public abstract class PlayServicesBaseObservable<T> extends BaseStateObservable<
 
     @Override
     public void call(final Subscriber<? super T> subscriber) {
-        if (activityResultCanceled()) {
-            subscriber.onError(new ConnectionCanceled());
+        if (activityResultCanceled(STATE_NAME)) {
+            subscriber.onError(new PlayServicesConnectionCanceledException());
             return;
         }
         GoogleApiClient.Builder builder = new GoogleApiClient.Builder(activity);
@@ -92,14 +93,14 @@ public abstract class PlayServicesBaseObservable<T> extends BaseStateObservable<
 
     protected void resolveConnectionFailed(ConnectionResult connectionResult, Subscriber<?> subscriber) {
         try {
-            recieveStateResponse();
+            recieveStateResponse(STATE_NAME);
             connectionResult.startResolutionForResult(activity, getRequestCode());
         } catch (IntentSender.SendIntentException e) {
             subscriber.onError(new GoogleApiConnectionFailed(e));
         }
     }
 
-    public static class ConnectionCanceled extends Exception {
+    public static class PlayServicesConnectionCanceledException extends ActivityResultState.ActivityResultCanceledException {
 
     }
 }

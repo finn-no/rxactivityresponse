@@ -11,13 +11,14 @@ import rx.subscriptions.Subscriptions;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 public class GetPermissionObservable extends BaseStateObservable<Boolean> implements RxPermissionRationale.RequestPermission {
+    private static final String STATE_NAME = "GetPermission";
     private final Activity activity;
     private final RxPermissionRationale rationale;
     private final String[] permissions;
     private boolean rationaleActive = false;
 
-    public GetPermissionObservable(Activity activity, RxState result, RxPermissionRationale rationale, String... permissions) {
-        super(result);
+    public GetPermissionObservable(Activity activity, RxState state, RxPermissionRationale rationale, String... permissions) {
+        super(state);
         this.activity = activity;
         this.rationale = rationale;
         this.permissions = permissions;
@@ -44,7 +45,7 @@ public class GetPermissionObservable extends BaseStateObservable<Boolean> implem
             subscriber.onNext(true);
             subscriber.onCompleted();
         } else {
-            if (permissionRequestDenied()) {
+            if (permissionRequestDenied(STATE_NAME)) {
                 subscriber.onNext(false);
                 subscriber.onCompleted();
             } else {
@@ -71,7 +72,7 @@ public class GetPermissionObservable extends BaseStateObservable<Boolean> implem
     public void requestPermission() {
         rationaleActive = false;
         Log.d("DBG", "NewRequestPermissionObservable.requestPermission  Time:" + System.currentTimeMillis());
-        recieveStateResponse();
+        recieveStateResponse(STATE_NAME);
         ActivityCompat.requestPermissions(activity, permissions, getRequestCode());
     }
 }

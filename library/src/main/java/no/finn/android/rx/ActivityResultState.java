@@ -1,5 +1,8 @@
 package no.finn.android.rx;
 
+import java.io.IOException;
+
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -34,4 +37,12 @@ public class ActivityResultState implements Parcelable {
             return new ActivityResultState[size];
         }
     };
+
+    public static class ActivityResultCanceledException extends IOException {
+
+    }
+
+    public boolean resultCanceled() {
+        return resultCode == Activity.RESULT_CANCELED;
+    }
 }

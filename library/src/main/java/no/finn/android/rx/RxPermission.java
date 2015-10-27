@@ -12,7 +12,7 @@ public class RxPermission {
 
     public static Observable<Boolean> getPermission(Activity activity, final RxState state, final RxPermissionRationale rationale, final String... permissions) {
         return Observable.create(new GetPermissionObservable(activity, state, rationale, permissions))
-                .doOnCompleted(new Action0() {
+                .finallyDo(new Action0() {
                     @Override
                     public void call() {
                         state.reset();

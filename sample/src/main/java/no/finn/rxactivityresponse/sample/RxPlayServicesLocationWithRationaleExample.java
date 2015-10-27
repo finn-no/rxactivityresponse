@@ -20,23 +20,22 @@ import junit.framework.Assert;
 import rx.functions.Action1;
 
 public class RxPlayServicesLocationWithRationaleExample extends Button implements View.OnClickListener, RxStateRestart {
-    private final int REQUEST_LOCATION = 42;
     private final RxState rxState;
 
     public RxPlayServicesLocationWithRationaleExample(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOnClickListener(this);
-        rxState = RxState.get(context, REQUEST_LOCATION, new WeakReference<RxStateRestart>(this));
+        rxState = RxState.get(context, ActivityResponses.GET_LOCATION, new WeakReference<RxStateRestart>(this));
     }
 
     @Override
     public void onClick(View v) {
-        rxAction(REQUEST_LOCATION);
+        rxAction(ActivityResponses.GET_LOCATION);
     }
 
     @Override
     public void rxAction(int requestCode) {
-        Assert.assertEquals(REQUEST_LOCATION, requestCode);
+        Assert.assertEquals(ActivityResponses.GET_LOCATION, requestCode);
         final LocationRequest locationRequest = new LocationRequest();
         locationRequest.setNumUpdates(1);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
@@ -48,6 +47,11 @@ public class RxPlayServicesLocationWithRationaleExample extends Button implement
                     public void call(Location location) {
                         //NB : if setNumUpdates != 0 you need to make sure you unsubscribe from the subscription!
                         Toast.makeText(getContext(), "Got a location " + location.toString(), Toast.LENGTH_LONG).show();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Toast.makeText(getContext(), "Exception : " + throwable, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
