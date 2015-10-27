@@ -1,7 +1,5 @@
 package no.finn.rxactivityresponse.sample;
 
-import java.lang.ref.WeakReference;
-
 import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
@@ -25,7 +23,7 @@ public class GpsLocationButton extends Button implements View.OnClickListener, R
     public GpsLocationButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOnClickListener(this);
-        rxState = RxState.get(context, ActivityResponses.GET_LOCATION, new WeakReference<RxStateRestart>(this));
+        rxState = RxState.get(context, ActivityResponses.GET_LOCATION, this);
     }
 
     @Override

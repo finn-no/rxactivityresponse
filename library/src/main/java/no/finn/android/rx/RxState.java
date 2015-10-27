@@ -3,10 +3,15 @@ package no.finn.android.rx;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
+import android.app.Activity;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
+import android.view.View;
 
 public class RxState implements Parcelable {
     private WeakReference<RxStateRestart> rxContinueRef;
@@ -20,6 +25,30 @@ public class RxState implements Parcelable {
         this.requestCode = requestCode;
         permissionResults = new HashMap<>();
         activityResults = new HashMap<>();
+    }
+
+    public static <T extends View & RxStateRestart> RxState get(Context context, int requestCode, T rxContinue) {
+        return get(context, requestCode, new WeakReference<RxStateRestart>(rxContinue));
+    }
+
+    public static <T extends Activity & RxStateRestart> RxState get(Context context, int requestCode, T rxContinue) {
+        return get(context, requestCode, new WeakReference<RxStateRestart>(rxContinue));
+    }
+
+    public static <T extends FragmentActivity & RxStateRestart> RxState get(Context context, int requestCode, T rxContinue) {
+        return get(context, requestCode, new WeakReference<RxStateRestart>(rxContinue));
+    }
+
+    public static <T extends ActivityCompat & RxStateRestart> RxState get(Context context, int requestCode, T rxContinue) {
+        return get(context, requestCode, new WeakReference<RxStateRestart>(rxContinue));
+    }
+
+    public static <T extends Fragment & RxStateRestart> RxState get(Context context, int requestCode, T rxContinue) {
+        return get(context, requestCode, new WeakReference<RxStateRestart>(rxContinue));
+    }
+
+    public static <T extends android.support.v4.app.Fragment & RxStateRestart> RxState get(Context context, int requestCode, T rxContinue) {
+        return get(context, requestCode, new WeakReference<RxStateRestart>(rxContinue));
     }
 
     public static RxState get(Context context, int requestCode, WeakReference<RxStateRestart> rxContinueRef) {

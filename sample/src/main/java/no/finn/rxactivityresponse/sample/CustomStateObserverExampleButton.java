@@ -1,7 +1,5 @@
 package no.finn.rxactivityresponse.sample;
 
-import java.lang.ref.WeakReference;
-
 import android.Manifest;
 import android.accounts.Account;
 import android.app.Activity;
@@ -32,7 +30,6 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -44,7 +41,7 @@ public class CustomStateObserverExampleButton extends Button implements View.OnC
     public CustomStateObserverExampleButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOnClickListener(this);
-        state = RxState.get(context, ActivityResponses.GET_LOGINTOKEN, new WeakReference<RxStateRestart>(this));
+        state = RxState.get(context, ActivityResponses.GET_LOGINTOKEN, this);
     }
 
     private static class GoogleLoginObservable extends PlayServicesBaseObservable<String> {

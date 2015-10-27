@@ -1,7 +1,5 @@
 package no.finn.rxactivityresponse.sample;
 
-import java.lang.ref.WeakReference;
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -24,7 +22,7 @@ public class SimplePermissionButton extends Button implements View.OnClickListen
     public SimplePermissionButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         // The State has to be created construction time (it's the only way we can get if we're serialized mid flow!)
-        rxState = RxState.get(context, ActivityResponses.GET_LOCATIONPERMISSION, new WeakReference<RxStateRestart>(this));
+        rxState = RxState.get(context, ActivityResponses.GET_LOCATIONPERMISSION, this);
         setOnClickListener(this);
     }
 
