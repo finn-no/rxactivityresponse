@@ -15,14 +15,12 @@ public class RxActivityStateDelegate {
         return (RxActivityStateDelegate) context.getSystemService(SYSTEMSERVICE_NAME);
     }
 
-
     public RxActivityStateDelegate getSystemService(String name) {
         if (SYSTEMSERVICE_NAME.equals(name)) {
             return this;
         }
         return null;
     }
-
 
     public void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState != null) {

@@ -19,8 +19,14 @@ import rx.functions.Func1;
 
 public class RxPlayServices {
     @SafeVarargs
-    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxState state, String[] permissions, RxPermissionRationale rationale, final Scope[] scopes, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
-        return resetState(Observable.create(new GetPermissionObservable(activity, state, rationale, permissions))
+    public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxState state, final String[] permissions, final RxPermissionRationale rationale, final Scope[] scopes, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+        return resetState(Observable.create(new GetPermissionStatusObservable(activity, permissions))
+                .flatMap(new Func1<PermissionResult, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(PermissionResult permissionResult) {
+                        return Observable.create(new GetPermissionObservable(activity, state, rationale, permissionResult));
+                    }
+                })
                 .flatMap(new Func1<Boolean, Observable<GoogleApiClient>>() {
                     @Override
                     public Observable<GoogleApiClient> call(Boolean granted) {
@@ -32,9 +38,15 @@ public class RxPlayServices {
                 }), state);
     }
 
-    public static Observable<Location> getLocation(final Activity activity, RxPermissionRationale rationale, final LocationRequest locationRequest, final RxState state) {
+    public static Observable<Location> getLocation(final Activity activity, final RxPermissionRationale rationale, final LocationRequest locationRequest, final RxState state) {
         String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
-        return resetState(Observable.create(new GetPermissionObservable(activity, state, rationale, permissions))
+        return resetState(Observable.create(new GetPermissionStatusObservable(activity, permissions))
+                .flatMap(new Func1<PermissionResult, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(PermissionResult permissionResult) {
+                        return Observable.create(new GetPermissionObservable(activity, state, rationale, permissionResult));
+                    }
+                })
                 .flatMap(new Func1<Boolean, Observable<Location>>() {
                     @Override
                     public Observable<Location> call(Boolean granted) {

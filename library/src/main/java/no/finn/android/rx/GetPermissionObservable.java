@@ -7,39 +7,23 @@ import rx.Subscriber;
 import rx.functions.Action0;
 import rx.subscriptions.Subscriptions;
 
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-
 public class GetPermissionObservable extends BaseStateObservable<Boolean> implements RxPermissionRationale.RequestPermission {
     private static final String STATE_NAME = "GetPermission";
     private final Activity activity;
     private final RxPermissionRationale rationale;
-    private final String[] permissions;
+    private final PermissionResult permissionResult;
     private boolean rationaleActive = false;
 
-    public GetPermissionObservable(Activity activity, RxState state, RxPermissionRationale rationale, String... permissions) {
+    public GetPermissionObservable(Activity activity, RxState state, RxPermissionRationale rationale, PermissionResult permissionResult) {
         super(state);
         this.activity = activity;
         this.rationale = rationale;
-        this.permissions = permissions;
+        this.permissionResult = permissionResult;
     }
 
     @Override
     public void call(Subscriber<? super Boolean> subscriber) {
-        //@fixme : share code between this and GetPermissionStatus - or just flatMap this..
-        boolean allPermissionGranted = true;
-        boolean showRationale = false;
-        for (String permission : permissions) {
-            boolean permissionGranted = ActivityCompat.checkSelfPermission(activity, permission) == PERMISSION_GRANTED;
-            allPermissionGranted = allPermissionGranted && permissionGranted;
-            if (!permissionGranted) {
-                showRationale = showRationale || ActivityCompat.shouldShowRequestPermissionRationale(activity, permission);
-            }
-        }
-        onPermissionResult(subscriber, allPermissionGranted, showRationale);
-    }
-
-    public void onPermissionResult(Subscriber<? super Boolean> subscriber, boolean allPermissionsGranted, boolean showRationale) {
-        if (allPermissionsGranted) {
+        if (permissionResult.granted) {
             subscriber.onNext(true);
             subscriber.onCompleted();
         } else {
@@ -47,7 +31,7 @@ public class GetPermissionObservable extends BaseStateObservable<Boolean> implem
                 subscriber.onNext(false);
                 subscriber.onCompleted();
             } else {
-                if (rationale != null && (showRationale || rationale.alwaysShowRationale)) {
+                if (rationale != null && (permissionResult.showRationale || rationale.alwaysShowRationale)) {
                     subscriber.add(Subscriptions.create(new Action0() {
                         @Override
                         public void call() {
@@ -70,6 +54,6 @@ public class GetPermissionObservable extends BaseStateObservable<Boolean> implem
     public void requestPermission() {
         rationaleActive = false;
         recieveStateResponse(STATE_NAME);
-        ActivityCompat.requestPermissions(activity, permissions, getRequestCode());
+        ActivityCompat.requestPermissions(activity, permissionResult.permissions, getRequestCode());
     }
 }

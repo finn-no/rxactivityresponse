@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import no.finn.android.rx.ActivityResultState;
 import no.finn.android.rx.GetPermissionObservable;
+import no.finn.android.rx.GetPermissionStatusObservable;
+import no.finn.android.rx.PermissionResult;
 import no.finn.android.rx.PlayServicesBaseObservable;
 import no.finn.android.rx.RxState;
 import no.finn.android.rx.RxStateRestart;
@@ -52,6 +54,11 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
             super(activity, state, scopes, services);
         }
 
+
+        private void resetClientForDemoPurposes(GoogleApiClient client) {
+            Plus.AccountApi.revokeAccessAndDisconnect(client);
+        }
+
         @Override
         public void onGoogleApiClientReady(final Subscriber<? super String> subscriber, final GoogleApiClient client) {
             if (activityResultCanceled(STATE_NAME)) {
@@ -66,6 +73,7 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
                     String scopes = "oauth2:" + GOOGLE_PLUS_SCOPES;
                     try {
                         subscriber.onNext(GoogleAuthUtil.getToken(activity.getApplicationContext(), account, scopes));
+                        resetClientForDemoPurposes(client);
                         subscriber.onCompleted();
                     } catch (Exception e) {
                         subscriber.onError(e);
@@ -92,6 +100,7 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
             subscriber.add(s);
         }
 
+
         public static class GoogleLoginCanceledException extends ActivityResultState.ActivityResultCanceledException {
 
         }
@@ -106,20 +115,28 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
         final Scope[] scopes = {new Scope(Scopes.PROFILE), new Scope(Scopes.EMAIL)};
         SnackbarRationaleOperator rationaleOperator = new SnackbarRationaleOperator(this, "Need permission for ...");
 
-        // Example code to revoke play services to reset the flow (play services doesn't ask again once an app has been given access. You dont want this in production, but it's handy for testing
-        /*RxPlayServices.getPlayServices((Activity) getContext(), responseHandler, permissions, scopes, Plus.API).subscribe(new Action1<GoogleApiClient>() {
-            @Override
-            public void call(GoogleApiClient client) {
-                //probably dont want to do this in "production", but it makes testing easier.
-                Plus.AccountApi.revokeAccessAndDisconnect(client);
-                client.disconnect();
-            }
-        });*/
-        getLoginToken(activity, permissions, scopes, rationaleOperator);
+        getLoginToken(activity, permissions, scopes, rationaleOperator)
+                .subscribe(new Action1<String>() {
+                    @Override
+                    public void call(String s) {
+                        Toast.makeText(getContext(), "Token is : " + s, Toast.LENGTH_SHORT).show();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Toast.makeText(getContext(), "Exception : " + throwable, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    private void getLoginToken(final Activity activity, String[] permissions, final Scope[] scopes, SnackbarRationaleOperator rationaleOperator) {
-        Observable.create(new GetPermissionObservable(activity, state, rationaleOperator, permissions))
+    private Observable<String> getLoginToken(final Activity activity, String[] permissions, final Scope[] scopes, final SnackbarRationaleOperator rationale) {
+        return Observable.create(new GetPermissionStatusObservable(activity, permissions))
+                .flatMap(new Func1<PermissionResult, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(PermissionResult permissionResult) {
+                        return Observable.create(new GetPermissionObservable(activity, state, rationale, permissionResult));
+                    }
+                })
                 .flatMap(new Func1<Boolean, Observable<String>>() {
                     @Override
                     public Observable<String> call(Boolean granted) {
@@ -135,18 +152,8 @@ public class RxLoginExample extends Button implements View.OnClickListener, RxSt
                     public void call() {
                         state.reset();
                     }
-                })
-                .subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String s) {
-                        Toast.makeText(getContext(), "Token is : " + s, Toast.LENGTH_SHORT).show();
-                    }
-                }, new Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        Toast.makeText(getContext(), "Exception : " + throwable, Toast.LENGTH_SHORT).show();
-                    }
                 });
+
     }
 
 
