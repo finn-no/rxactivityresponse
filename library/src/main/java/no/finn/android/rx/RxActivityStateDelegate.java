@@ -1,6 +1,4 @@
-package no.finn.android.rx.tmpnew;
-
-import java.lang.ref.WeakReference;
+package no.finn.android.rx;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,31 +6,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
 
-import no.finn.android.rx.RxActivityResponseDelegate;
-
-public class PersistedActivityResultActivityDelegate {
+public class RxActivityStateDelegate {
     private static final String SYSTEMSERVICE_NAME = "PersistedActivityResult";
 
-    private SparseArray<RxState> resultTracking = new SparseArray<>();
-
-    //@fixme : document this...
-    public static RxState getOrCreate(Context context, int requestCode, WeakReference<RxActivityResponseDelegate.RxContinue> rxContinueRef) {
-        final PersistedActivityResultActivityDelegate delegate = get(context);
-        RxState result = delegate.resultTracking.get(requestCode);
-        if (result == null) {
-            result = new RxState(requestCode);
-            delegate.resultTracking.put(requestCode, result);
-        }
-        return result.withContinue(rxContinueRef);
-    }
+    SparseArray<RxState> resultTracking = new SparseArray<>();
 
     @SuppressWarnings("ResourceType")
-    public static PersistedActivityResultActivityDelegate get(Context context) {
-        return (PersistedActivityResultActivityDelegate) context.getSystemService(SYSTEMSERVICE_NAME);
+    public static RxActivityStateDelegate get(Context context) {
+        return (RxActivityStateDelegate) context.getSystemService(SYSTEMSERVICE_NAME);
     }
 
 
-    public PersistedActivityResultActivityDelegate getSystemService(String name) {
+    public RxActivityStateDelegate getSystemService(String name) {
         if (SYSTEMSERVICE_NAME.equals(name)) {
             return this;
         }
@@ -65,4 +50,5 @@ public class PersistedActivityResultActivityDelegate {
             activityResult.onRequestPermissionsResult(permissions, grantResults);
         }
     }
+
 }

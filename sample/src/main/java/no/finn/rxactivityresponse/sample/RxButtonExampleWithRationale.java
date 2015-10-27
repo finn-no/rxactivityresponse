@@ -11,23 +11,22 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import no.finn.android.rx.RxActivityResponseDelegate;
+import no.finn.android.rx.RxPermission;
 import no.finn.android.rx.RxPermissionRationale;
-import no.finn.android.rx.tmpnew.RxState;
-import no.finn.android.rx.tmpnew.PersistedActivityResultActivityDelegate;
-import no.finn.android.rx.tmpnew.RxPermissionB;
+import no.finn.android.rx.RxState;
+import no.finn.android.rx.RxStateRestart;
 
 import junit.framework.Assert;
 import rx.functions.Action1;
 
-public class RxButtonExampleWithRationale extends Button implements View.OnClickListener, RxActivityResponseDelegate.RxContinue {
+public class RxButtonExampleWithRationale extends Button implements View.OnClickListener, RxStateRestart {
     private static final int GET_LOCATION = 42;
     private final RxState rxState;
 
     public RxButtonExampleWithRationale(Context context, AttributeSet attrs) {
         super(context, attrs);
         Log.d("DBG", "RxButtonExampleWithRationale.RxButtonExampleWithRationale CONSTRUCTION TIME Time:" + System.currentTimeMillis());
-        rxState = PersistedActivityResultActivityDelegate.getOrCreate(context, GET_LOCATION, new WeakReference<RxActivityResponseDelegate.RxContinue>(this));
+        rxState = RxState.get(context, GET_LOCATION, new WeakReference<RxStateRestart>(this));
         setOnClickListener(this);
     }
 
@@ -43,7 +42,7 @@ public class RxButtonExampleWithRationale extends Button implements View.OnClick
         Log.d("DBG", "RxButtonExampleWithRationale.startRequest " + rxState + " Time:" + System.currentTimeMillis());
 
         final String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
-        RxPermissionB.getPermission((Activity) getContext(), rxState, rationaleOperator, permissions)
+        RxPermission.getPermission((Activity) getContext(), rxState, rationaleOperator, permissions)
                 .subscribe(new Action1<Boolean>() {
                     @Override
                     public void call(Boolean granted) {

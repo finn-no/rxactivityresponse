@@ -1,20 +1,20 @@
 package no.finn.rxactivityresponse.sample;
 
+import java.lang.ref.WeakReference;
+
 import android.Manifest;
 import android.accounts.Account;
 import android.app.Activity;
 import android.content.Context;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import no.finn.android.rx.PlayServicesBaseObservable;
-import no.finn.android.rx.RxActivityResponseDelegate;
 import no.finn.android.rx.RxPermission;
-import no.finn.android.rx.RxResponseHandler;
+import no.finn.android.rx.RxState;
+import no.finn.android.rx.RxStateRestart;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -23,6 +23,7 @@ import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
+import junit.framework.Assert;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -31,19 +32,21 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class RxLoginExample extends Button implements View.OnClickListener {
+public class RxLoginExample extends Button implements View.OnClickListener, RxStateRestart {
     private static final String GOOGLE_PLUS_SCOPES = Scopes.PLUS_LOGIN + " " + "email";
-    private ResponseHandler responseHandler = new ResponseHandler();
+    private static final int GET_LOGIN = 42;
+    private final RxState state;
 
     public RxLoginExample(Context context, AttributeSet attrs) {
         super(context, attrs);
         setOnClickListener(this);
+        state = RxState.get(context, GET_LOGIN, new WeakReference<RxStateRestart>(this));
     }
 
-    private static class GoogleLoginObserver extends PlayServicesBaseObservable<String> {
+    private static class GoogleLoginObservable extends PlayServicesBaseObservable<String> {
         @SafeVarargs
-        public GoogleLoginObserver(Activity activity, RxResponseHandler responseHandler, Scope[] scopes, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
-            super(activity, responseHandler, scopes, services);
+        public GoogleLoginObservable(Activity activity, RxState state, Scope[] scopes, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+            super(activity, state, scopes, services);
         }
 
         @Override
@@ -71,11 +74,8 @@ public class RxLoginExample extends Button implements View.OnClickListener {
                         @Override
                         public void call(Throwable throwable) {
                             if (throwable instanceof UserRecoverableAuthException) {
-                                RxActivityResponseDelegate rxActivityResponseDelegate = RxActivityResponseDelegate.get(activity);
-                                if (!rxActivityResponseDelegate.hasActiveResponse()) {
-                                    rxActivityResponseDelegate.setResponse(responseHandler);
-                                    activity.startActivityForResult(((UserRecoverableAuthException) throwable).getIntent(), rxActivityResponseDelegate.getRequestCode());
-                                }
+                                recieveStateResponse(); //@fixme : not handling result..
+                                activity.startActivityForResult(((UserRecoverableAuthException) throwable).getIntent(), getRequestCode());
                                 subscriber.onCompleted();
                             } else {
                                 subscriber.onError(throwable);
@@ -86,14 +86,16 @@ public class RxLoginExample extends Button implements View.OnClickListener {
         }
     }
 
-    public void getLoginToken() {
+    @Override
+    public void rxAction(int requestCode) {
+        Assert.assertEquals(requestCode, GET_LOGIN);
         final Activity activity = (Activity) getContext();
         String[] permissions = new String[]{Manifest.permission.GET_ACCOUNTS};
 
         final Scope[] scopes = {new Scope(Scopes.PROFILE), new Scope(Scopes.EMAIL)};
         SnackbarRationaleOperator rationaleOperator = new SnackbarRationaleOperator(this, "Need permission for ...");
 
-        // Example code to revoke play services to reset the flow (play services doesn't ask again once an app has been given access. You dont want this in production, but it's handy for testing 
+        // Example code to revoke play services to reset the flow (play services doesn't ask again once an app has been given access. You dont want this in production, but it's handy for testing
         /*RxPlayServices.getPlayServices((Activity) getContext(), responseHandler, permissions, scopes, Plus.API).subscribe(new Action1<GoogleApiClient>() {
             @Override
             public void call(GoogleApiClient client) {
@@ -103,12 +105,12 @@ public class RxLoginExample extends Button implements View.OnClickListener {
             }
         });*/
 
-        RxPermission.getPermission(activity, responseHandler, rationaleOperator, permissions)
+        RxPermission.getPermission(activity, state, rationaleOperator, permissions)
                 .flatMap(new Func1<Boolean, Observable<String>>() {
                     @Override
                     public Observable<String> call(Boolean granted) {
                         if (granted) {
-                            return Observable.create(new GoogleLoginObserver(activity, responseHandler, scopes, Plus.API))
+                            return Observable.create(new GoogleLoginObservable(activity, state, scopes, Plus.API))
                                     .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread());
                         }
                         return Observable.empty();
@@ -126,37 +128,6 @@ public class RxLoginExample extends Button implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        getLoginToken();
-    }
-
-    // This class handles restarting the permission request when a permission is retrieved. Since this class can be serialized
-    // we could also pass extra arguments through here and back to the getLocation function.
-    private static class ResponseHandler extends RxResponseHandler implements Parcelable {
-        @Override
-        public void onResponse(Activity activity, boolean success, Response response) {
-            if (success) {
-                ((RxLoginExample) activity.findViewById(R.id.getlogintoken)).getLoginToken();
-            }
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-
-        }
-
-        public static final Creator CREATOR = new Creator() {
-            public ResponseHandler createFromParcel(Parcel in) {
-                return new ResponseHandler();
-            }
-
-            public ResponseHandler[] newArray(int size) {
-                return new ResponseHandler[size];
-            }
-        };
+        rxAction(GET_LOGIN);
     }
 }

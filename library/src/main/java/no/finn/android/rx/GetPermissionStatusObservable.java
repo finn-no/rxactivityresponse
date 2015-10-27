@@ -1,9 +1,7 @@
-package no.finn.android.rx.tmpnew;
+package no.finn.android.rx;
 
 import android.app.Activity;
 import android.support.v4.app.ActivityCompat;
-
-import no.finn.android.rx.PermissionResult;
 
 import rx.Observable;
 import rx.Subscriber;

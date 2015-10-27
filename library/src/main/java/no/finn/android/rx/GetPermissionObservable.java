@@ -1,39 +1,50 @@
-package no.finn.android.rx.tmpnew;
+package no.finn.android.rx;
 
 import android.app.Activity;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
-import no.finn.android.rx.PermissionStatusBaseObservable;
-import no.finn.android.rx.RxPermissionRationale;
-
 import rx.Subscriber;
 import rx.functions.Action0;
 import rx.subscriptions.Subscriptions;
 
-public class GetPermissionObservable extends PermissionStatusBaseObservable<Boolean> implements RxPermissionRationale.RequestPermission {
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+
+public class GetPermissionObservable extends BaseStateObservable<Boolean> implements RxPermissionRationale.RequestPermission {
     private final Activity activity;
-    private final RxState result;
     private final RxPermissionRationale rationale;
     private final String[] permissions;
     private boolean rationaleActive = false;
 
     public GetPermissionObservable(Activity activity, RxState result, RxPermissionRationale rationale, String... permissions) {
-        super(activity, permissions);
+        super(result);
         this.activity = activity;
-        this.result = result;
         this.rationale = rationale;
         this.permissions = permissions;
     }
 
     @Override
+    public void call(Subscriber<? super Boolean> subscriber) {
+        //@fixme : share code between this and GetPermissionStatus - or just flatMap this..
+        boolean allPermissionGranted = true;
+        boolean showRationale = false;
+        for (String permission : permissions) {
+            boolean permissionGranted = ActivityCompat.checkSelfPermission(activity, permission) == PERMISSION_GRANTED;
+            allPermissionGranted = allPermissionGranted && permissionGranted;
+            if (!permissionGranted) {
+                showRationale = showRationale || ActivityCompat.shouldShowRequestPermissionRationale(activity, permission);
+            }
+        }
+        onPermissionResult(subscriber, allPermissionGranted, showRationale);
+    }
+
     public void onPermissionResult(Subscriber<? super Boolean> subscriber, boolean allPermissionsGranted, boolean showRationale) {
         Log.d("DBG", "RXCALL : NewRequestPermissionObservable.onPermissionResult " + allPermissionsGranted + " Time:" + System.currentTimeMillis());
         if (allPermissionsGranted) {
             subscriber.onNext(true);
             subscriber.onCompleted();
         } else {
-            if (result.permissionRequestDenied(getRequestName())) {
+            if (permissionRequestDenied()) {
                 subscriber.onNext(false);
                 subscriber.onCompleted();
             } else {
@@ -60,11 +71,7 @@ public class GetPermissionObservable extends PermissionStatusBaseObservable<Bool
     public void requestPermission() {
         rationaleActive = false;
         Log.d("DBG", "NewRequestPermissionObservable.requestPermission  Time:" + System.currentTimeMillis());
-        result.recieve(getRequestName());
-        ActivityCompat.requestPermissions(activity, permissions, result.requestCode);
-    }
-
-    protected String getRequestName() {
-        return "PermissionRequest";
+        recieveStateResponse();
+        ActivityCompat.requestPermissions(activity, permissions, getRequestCode());
     }
 }

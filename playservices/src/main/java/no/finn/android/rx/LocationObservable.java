@@ -15,8 +15,8 @@ public class LocationObservable extends LocationSettingsObservable<Location> {
     private GoogleApiClient client;
 
     @SafeVarargs
-    public LocationObservable(Activity activity, RxResponseHandler responseHandler, LocationRequest locationRequest, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
-        super(activity, responseHandler, locationRequest, services);
+    public LocationObservable(Activity activity, RxState state, LocationRequest locationRequest, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+        super(activity, state, locationRequest, services);
     }
 
     @Override

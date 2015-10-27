@@ -18,8 +18,8 @@ import rx.Subscriber;
 public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObservable<T> {
     public final LocationRequest locationRequest;
 
-    public LocationSettingsObservable(Activity activity, RxResponseHandler responseHandler, LocationRequest locationRequest, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
-        super(activity, responseHandler, services);
+    public LocationSettingsObservable(Activity activity, RxState state, LocationRequest locationRequest, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+        super(activity, state, services);
         this.locationRequest = locationRequest;
     }
 
@@ -29,6 +29,7 @@ public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObse
     }
 
     private void handleLocationSettings(final Subscriber<? super T> subscriber, final GoogleApiClient client) {
+        //@fixme : handle state, also state with our parent is a bit .. fishy :/
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .setAlwaysShow(true)
                 .addLocationRequest(locationRequest);
@@ -43,16 +44,8 @@ public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObse
                         locationSettingSuccess(subscriber, client);
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        try {
-                            RxActivityResponseDelegate rxActivityResponseDelegate = RxActivityResponseDelegate.get(activity);
-                            if (!rxActivityResponseDelegate.hasActiveResponse()) {
-                                rxActivityResponseDelegate.setResponse(responseHandler);
-                                status.startResolutionForResult(activity, rxActivityResponseDelegate.getRequestCode());
-                            }
-                            subscriber.unsubscribe(); // silently close our api connection, full restart through responsehandler required, so we can close this connection.
-                        } catch (IntentSender.SendIntentException e) {
-                            subscriber.onError(new RxPlayServices.RxLocationError(e));
-                        }
+                        resolveResolutionRequired(subscriber, status);
+                        subscriber.unsubscribe(); // silently close our api connection, full restart through responsehandler required, so we can close this connection.
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
                         subscriber.onError(new RxPlayServices.RxLocationError(LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE));
@@ -60,6 +53,15 @@ public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObse
                 }
             }
         });
+    }
+
+    protected void resolveResolutionRequired(Subscriber<? super T> subscriber, Status status) {
+        recieveStateResponse();
+        try {
+            status.startResolutionForResult(activity, getRequestCode());
+        } catch (IntentSender.SendIntentException e) {
+            subscriber.onError(new RxPlayServices.RxLocationError(e));
+        }
     }
 
     protected abstract void locationSettingSuccess(Subscriber<? super T> subscriber, GoogleApiClient client);

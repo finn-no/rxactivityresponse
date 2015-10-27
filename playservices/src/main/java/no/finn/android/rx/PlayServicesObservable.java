@@ -10,13 +10,13 @@ import rx.Subscriber;
 
 public class PlayServicesObservable extends PlayServicesBaseObservable<GoogleApiClient> {
     @SafeVarargs
-    public PlayServicesObservable(Activity activity, RxResponseHandler responseHandler, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
-        super(activity, responseHandler, services);
+    public PlayServicesObservable(Activity activity, RxState state, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+        super(activity, state, null, services);
     }
 
     @SafeVarargs
-    public PlayServicesObservable(Activity activity, RxResponseHandler responseHandler, Scope[] scopes, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
-        super(activity, responseHandler, scopes, services);
+    public PlayServicesObservable(Activity activity, RxState state, Scope[] scopes, Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
+        super(activity, state, scopes, services);
     }
 
     @Override

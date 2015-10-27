@@ -1,4 +1,4 @@
-package no.finn.android.rx.tmpnew;
+package no.finn.android.rx;
 
 import android.content.pm.PackageManager;
 import android.os.Parcel;
