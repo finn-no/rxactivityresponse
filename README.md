@@ -69,12 +69,17 @@ For a complete example see https://github.com/finn-no/rxactivityresponse/blob/ma
 
 ## Gradle.properties changes
 
-Add jcenter() to your build.gradle repositories block and rxactivityresponse to your dependencies:
-
 ```
 
-compile('no.finn.rxactivityresponse:library:0.4')
-compile('no.finn.rxactivityresponse:playservices:0.4')
+repositories {
+    // NB : This is temporary, we are currently working on pushing to jcenter().
+    maven { url  "http://dl.bintray.com/finnandroid/maven" }
+}
+
+dependencies {
+    compile('no.finn.rxactivityresponse:library:0.4')
+    compile('no.finn.rxactivityresponse:playservices:0.4')
+}
 
 ```
 
