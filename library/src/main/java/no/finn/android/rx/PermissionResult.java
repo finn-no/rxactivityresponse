@@ -17,6 +17,7 @@ public class PermissionResult {
             boolean permissionGranted = grantResults[i] == PERMISSION_GRANTED;
             allPermissionsGranted = allPermissionsGranted && permissionGranted;
         }
-        this.granted = allPermissionsGranted;
+        // If permissions.length == 0 it should be considered a cancellation according to documentation
+        this.granted = allPermissionsGranted && permissions.length > 0;
     }
 }
