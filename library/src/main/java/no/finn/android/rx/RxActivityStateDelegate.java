@@ -7,7 +7,7 @@ import android.util.SparseArray;
 
 public class RxActivityStateDelegate {
     private static final String SYSTEMSERVICE_NAME = "PersistedActivityResult";
-    private SparseArray<RxState> state = new SparseArray<>();
+    private static SparseArray<RxState> state = new SparseArray<>();
 
     @SuppressWarnings("ResourceType")
     public static RxActivityStateDelegate get(Context context) {

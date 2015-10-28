@@ -40,6 +40,4 @@ public class SerializedRxSampleActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         rxActivityStateDelegate.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-
-
 }
