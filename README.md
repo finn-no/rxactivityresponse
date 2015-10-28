@@ -77,8 +77,8 @@ repositories {
 }
 
 dependencies {
-    compile('no.finn.rxactivityresponse:library:0.4')
-    compile('no.finn.rxactivityresponse:playservices:0.4')
+    compile('no.finn.rxactivityresponse:library:0.4.1')
+    compile('no.finn.rxactivityresponse:playservices:0.4.1')
 }
 
 ```
