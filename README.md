@@ -24,7 +24,7 @@ ExampleView:
 
 ```
 
-##### The large problems with this solution:
+###### The large problems with this approach:
 1. permission/locationsettings requests respond in onActivityResult/onRequestPermissionsResult in the activity.
 2. onSaveInstanceState might be triggered if the user rotates during the request, or if device is memory preasured during onActivityResult. This means the view we're subscribing in no longer exists.
 
