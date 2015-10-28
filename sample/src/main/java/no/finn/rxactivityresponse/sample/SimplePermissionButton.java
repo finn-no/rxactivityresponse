@@ -34,6 +34,8 @@ public class SimplePermissionButton extends Button implements View.OnClickListen
     @Override
     public void rxAction(int requestCode) {
         Assert.assertEquals(requestCode, ActivityResponses.GET_LOCATIONPERMISSION);
+
+        // NB : Rationale is optional and can be null
         RxPermissionRationale rationaleOperator = new SnackbarRationaleOperator(this, "I need access to ...");
 
         final String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};

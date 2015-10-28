@@ -38,6 +38,7 @@ public class GpsLocationButton extends Button implements View.OnClickListener, R
         locationRequest.setNumUpdates(1);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
+        // NB : Rationale is optional and can be null
         RxPermissionRationale rationaleOperator = new SnackbarRationaleOperator(this, "I need access to ...");
 
         // GetLocation fetches the required permission, turns on location stuff with the locationsetting api, then recieves a location

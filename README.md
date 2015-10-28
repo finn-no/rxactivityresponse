@@ -3,56 +3,80 @@
 ## About
 A library for using rx + onActivityResponse/onRequestPermissionsResult on android. For example for using rx and permissions/gplay settings/google login etc. It was written to deal with google play LocationSettings (giving response in onActivityResult), and Google Login (also giving response in OnActivityResult).
 
-## The problem
-If you do use rx on android. And something during that the rx call might serialize your entire app. (For example leaving the app, and getting the response in onActivityResult). This breaks rx quite badly.
+### The problem
 
-The library allows creating an object to deal with this problem. This object will be serialized, and can be in the same location as the subscription was done, to keep that part of the code in the same place. Rather than having to deal with every single onActivityResponse in your main activity.
-
-## How does this work:
-Lets image we have a View that requires permission to access location.
-
-NB : This is a simple example. In this case you could do .subscribe() and only care about onRequestPermissionsResult. However, you might want to do rx.getLocation(). That first gets the permission, then enables gps through LocationSettings api, then gets the location. In this case the example makes more sense :)
+Lets do an example without this library's helpers.
 
 ```
+
 ExampleView:
-   void getLocation() {
-     RxPermission.getPermission(getContext(), <Our ResponseHandler>, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
-        .subscribe(new Action1<Boolean>() {
-            @Override
-            public void call(Boolean permission) {
-                if (permission) {
-                    // we have the permissions
-                }
-            }
-        });
-   }
-```
-
-<Our ResponseHandler> is a class you can serialize. (In the sample it's a parcelable, but you have controll over the serialization, we use jackson..). It will be serialized if the activity needs to. When it's deserialized it's onRequestPermissionsResult/onActivityResult will run, and it can handle whatever it needs to. Refinding the view if neccesary:
+  void getLocation() {
+     Observable.create(getPermissionStatusObservable())
+     	.map(if (needsPermission) getPermissionObservable())
+     	.map(if (locationServicesDisabled) enableLocationServicesObservable())
+     	.map(getLocation())
+     	.subscribe(location -> useLocation(location))
+  }
+  
+  void useLocation(location) {
+    ...
+  }
 
 ```
-ResponseHandler:
-    public void onRequestPermissionsResult(activity, permissions, grantResults) {
-        if (permissionsGranted) {
-            // The RxPermissions call will now have the permission, and continue on to give a response.
-            activity.findViewById(ExampleViewId).getLocation();
-        } else {
-            // Optionally handle permission denied cases differently.
-        }
+
+This seems fairly straightforward, but lets dissect it a bit. GetPermissionObservable gets it's result in onRequestPermissionsResult in the activity. EnableLocationServices in onActivityResult in the activity (in the case of getting a google login token it has to bounce through multiple onActivityResult).
+
+Also, if the user rotates the device while you are asking for permission, or the device is memory preasured when asking for onActivityResult, the app might go through onSaveInstanceState. And the view where useLocation exists might be recreated.
+
+### Our solution
+
+First you need to add the library to your build.gradle file. 
+
+Then you need to implement all activity delegate calls. This should be a small one time job, see https://github.com/finn-no/rxactivityresponse/blob/master/sample/src/main/java/no/finn/rxactivityresponse/sample/SerializedRxSampleActivity.java .
+
+```
+
+ExampleView implements RxStateRestart:
+  static GET_LOCATION_ACTIVITY_REQUESTCODE = 42;
+  RxState rxState;
+
+  ExampleView() {
+    // This has to be done construction time. This allows the library to restart the request if neccesary.
+    rxState = RxState.get(GET_LOCATION_ACTIVITY_REQUESTCODE, this);
+  }
+
+  void getLocation() {
+     // Starting a new call is exactly the same as restarting one during onActivityResponse/onRequestPermissionsResult
+     rxAction(GET_LOCATION_ACTIVITY_REQUESTCODE)
+  }
+  
+  @Override
+  rxAction(requestCode) {
+    if (requestCode == GET_LOCATION_ACTIVITY_REQUESTCODE) {
+        // This restarts our Rx call if we've gotten a response in onRequestPermissionsResult/onActivityResult.
+        RxPlayServices.getLocation(locationRequest, rxState)
+            .subscribe(location -> useLocation(location));
     }
-}
+  }
+  
+  void useLocation(location) {
+    ...
+  }
+  
 ```
 
-For a complete example see https://github.com/finn-no/rxactivityresponse/blob/master/sample/src/main/java/no/finn/rxactivityresponse/sample/RxButtonExample.java
+That's it! This will work even if the app goes through onSaveInstanceState during the rx call.
 
-## Using it
+For a complete example see https://github.com/finn-no/rxactivityresponse/blob/master/sample/src/main/java/no/finn/rxactivityresponse/sample/GpsLocationButton.java
+
+## Gradle.properties changes
 
 Add jcenter() to your build.gradle repositories block and rxactivity response to your dependencies: 
 
 ```
 
-compile('no.finn.rxactivityresponse:library:0.3')
-compile('no.finn.rxactivityresponse:playservices:0.3')
+compile('no.finn.rxactivityresponse:library:0.4')
+compile('no.finn.rxactivityresponse:playservices:0.4')
 
 ```
 

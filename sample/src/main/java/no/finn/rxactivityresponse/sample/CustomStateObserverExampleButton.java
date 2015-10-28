@@ -113,6 +113,8 @@ public class CustomStateObserverExampleButton extends Button implements View.OnC
         String[] permissions = new String[]{Manifest.permission.GET_ACCOUNTS};
 
         final Scope[] scopes = {new Scope(Scopes.PROFILE), new Scope(Scopes.EMAIL)};
+
+        // NB : Rationale is optional and can be null
         SnackbarRationaleOperator rationaleOperator = new SnackbarRationaleOperator(this, "Need permission for ...");
 
         getLoginToken(activity, permissions, scopes, rationaleOperator)

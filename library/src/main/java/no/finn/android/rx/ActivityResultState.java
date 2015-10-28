@@ -1,7 +1,5 @@
 package no.finn.android.rx;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Parcel;
