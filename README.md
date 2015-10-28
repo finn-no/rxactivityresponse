@@ -1,7 +1,7 @@
 # RxActivityResponse
 
 ## About
-A library for using rx + onActivityResponse/onRequestPermissionsResult on android. For example for using rx and permissions/gplay settings/google login etc. It was written to deal with google play LocationSettings (giving response in onActivityResult), and Google Login (also giving response in OnActivityResult).
+A library for using rx + onActivityResponse/onRequestPermissionsResult on android. For example for using rx and permissions/gplay settings/Google login etc. It was written to deal with Google Play LocationSettings (giving response in onActivityResult), and Google Login (also giving response in OnActivityResult).
 
 ### The problem
 
@@ -24,15 +24,13 @@ ExampleView:
 
 ```
 
-###### The large problems with this approach:
+###### The main problems with this approach:
 1. permission/locationsettings requests respond in onActivityResult/onRequestPermissionsResult in the activity.
-2. onSaveInstanceState might be triggered if the user rotates during the request, or if device is memory pressured during onActivityResult. This means the view we're subscribing in no longer exists.
+2. onSaveInstanceState might be triggered if the user rotates during the request, or if device is memory pressured during onActivityResult. This means the view we're subscribing from no longer exists.
 
 ### Our solution
 
-First you need to add the library to your build.gradle file. 
-
-Then you need to implement all activity delegate calls. This should be a small one time job, see https://github.com/finn-no/rxactivityresponse/blob/master/sample/src/main/java/no/finn/rxactivityresponse/sample/SerializedRxSampleActivity.java .
+Implement all activity delegate calls. This should be a small one time job, see https://github.com/finn-no/rxactivityresponse/blob/master/sample/src/main/java/no/finn/rxactivityresponse/sample/SerializedRxSampleActivity.java .
 
 ```
 
@@ -71,7 +69,7 @@ For a complete example see https://github.com/finn-no/rxactivityresponse/blob/ma
 
 ## Gradle.properties changes
 
-Add jcenter() to your build.gradle repositories block and rxactivity response to your dependencies: 
+Add jcenter() to your build.gradle repositories block and rxactivityresponse to your dependencies:
 
 ```
 
