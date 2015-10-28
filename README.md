@@ -24,9 +24,9 @@ ExampleView:
 
 ```
 
-This seems fairly straightforward, but lets dissect it a bit. GetPermissionObservable gets it's result in onRequestPermissionsResult in the activity. EnableLocationServices in onActivityResult in the activity (in the case of getting a google login token it has to bounce through multiple onActivityResult).
-
-Also, if the user rotates the device while you are asking for permission, or the device is memory preasured when asking for onActivityResult, the app might go through onSaveInstanceState. And the view where useLocation exists might be recreated.
+##### The large problems with this solution:
+1. permission/locationsettings requests respond in onActivityResult/onRequestPermissionsResult in the activity.
+2. onSaveInstanceState might be triggered if the user rotates during the request, or if device is memory preasured during onActivityResult. This means the view we're subscribing in no longer exists.
 
 ### Our solution
 
