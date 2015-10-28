@@ -6,8 +6,6 @@ import android.support.v4.app.ActivityCompat;
 import rx.Observable;
 import rx.Subscriber;
 
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-
 public class GetPermissionStatusObservable implements Observable.OnSubscribe<PermissionResult> {
     private final Activity activity;
     private final String[] permissions;
@@ -26,5 +24,6 @@ public class GetPermissionStatusObservable implements Observable.OnSubscribe<Per
             showRationale = ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[i]);
         }
         subscriber.onNext(new PermissionResult(permissions, grantResults, showRationale));
+        subscriber.onCompleted();
     }
 }

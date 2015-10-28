@@ -3,7 +3,6 @@ package no.finn.android.rx;
 import android.app.Activity;
 
 import rx.Observable;
-import rx.functions.Action0;
 import rx.functions.Func1;
 
 public class RxPermission {
