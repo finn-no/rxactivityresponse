@@ -6,7 +6,8 @@ import android.os.Bundle;
 import android.util.SparseArray;
 
 public class RxActivityStateDelegate {
-    private static final String SYSTEMSERVICE_NAME = "PersistedActivityResult";
+    private static final String SYSTEMSERVICE_NAME =  RxActivityStateDelegate.class.getName() + ".PersistedActivityResult";
+    private static final String RESULTS_KEY = RxActivityStateDelegate.class.getName() + ".RESULTS_KEY";
     private static SparseArray<RxState> state = new SparseArray<>();
 
     @SuppressWarnings("ResourceType")
@@ -23,12 +24,12 @@ public class RxActivityStateDelegate {
 
     public void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            state = savedInstanceState.getSparseParcelableArray("RESULTS");
+            state = savedInstanceState.getSparseParcelableArray(RESULTS_KEY);
         }
     }
 
     public void onSaveInstanceState(Bundle outState) {
-        outState.putSparseParcelableArray("RESULTS", state);
+        outState.putSparseParcelableArray(RESULTS_KEY, state);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
