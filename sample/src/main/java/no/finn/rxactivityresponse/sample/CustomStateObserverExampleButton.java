@@ -67,6 +67,7 @@ public class CustomStateObserverExampleButton extends Button implements View.OnC
             final Subscription s = Observable.create(new Observable.OnSubscribe<String>() {
                 @Override
                 public void call(Subscriber<? super String> subscriber) {
+                    //noinspection MissingPermission
                     String accountName = Plus.AccountApi.getAccountName(client);
                     Account account = new Account(accountName, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
                     String scopes = "oauth2:" + GOOGLE_PLUS_SCOPES;

@@ -22,17 +22,17 @@ repositories {
 
 dependencies {
     compile project(':rxactivityresponse')
-    compile('com.google.android.gms:play-services-base:8.1.0')
-    compile('com.google.android.gms:play-services-location:8.1.0')
+    compile('com.google.android.gms:play-services-base:10.0.1')
+    compile('com.google.android.gms:play-services-location:10.0.1')
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 25
     }
 
     packagingOptions {

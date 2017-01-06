@@ -6,17 +6,19 @@ dependencies {
     compile project(':rxactivityresponse')
     compile project(':rxactivityresponse-playservices')
     compile('io.reactivex:rxandroid:0.24.0')
-    compile('com.android.support:design:23.0.1')
-    compile('com.google.android.gms:play-services-identity:8.1.0')
-    compile('com.google.android.gms:play-services-plus:8.1.0')
+    compile('com.android.support:design:25.1.0')
+    compile('com.google.android.gms:play-services-identity:10.0.1')
+    compile('com.google.android.gms:play-services-plus:10.0.1')
+    compile('com.google.android.gms:play-services-auth:10.0.1')
+    compile('com.google.android.gms:play-services-location:10.0.1')
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 25
     }
 }

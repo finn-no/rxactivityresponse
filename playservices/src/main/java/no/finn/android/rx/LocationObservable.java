@@ -40,6 +40,7 @@ public class LocationObservable extends LocationSettingsObservable<Location> {
             }
         };
 
+        //noinspection MissingPermission
         LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, locationListener);
     }
 }
