@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/finn-no/rxactivityresponse.svg?branch=master)](https://travis-ci.org/finn-no/rxactivityresponse)
 # RxActivityResponse
 
 ## About
@@ -72,13 +73,12 @@ For a complete example see https://github.com/finn-no/rxactivityresponse/blob/ma
 ```
 
 repositories {
-    // NB : This is temporary, we are currently working on pushing to jcenter().
-    maven { url  "http://dl.bintray.com/finnandroid/maven" }
+    jcenter()
 }
 
 dependencies {
-    compile('no.finn.rxactivityresponse:library:0.4.1')
-    compile('no.finn.rxactivityresponse:playservices:0.4.1')
+    compile('no.finn.rxactivityresponse:library:0.4.2')
+    compile('no.finn.rxactivityresponse:playservices:0.4.2')
 }
 
 ```
