@@ -1,15 +1,27 @@
 language: android
 android:
   components:
-    - tools
-    - platform-tools
-    - build-tools-25
-    - android-25
-    - extra-android-m2repository
+  - tools
+  - platform-tools
+  - build-tools-25
+  - android-25
+  - extra-android-m2repository
 jdk:
 - oraclejdk8
 before_install:
 - mkdir -p "$ANDROID_HOME/licenses" || true
 - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"
 - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+env:
+  global:
+  - secure: owmN8ixWN0TlsX8N9l/WDR6uWLuab9cwQMY7e0tnpCLwAjgb1cUn+cXCyewR76CYhfIWfgroS1amB6w/dMiJVbWwoRspTByUyw/7C72xZVq6eq8OYUmJdAPtyS1DLMjBn+pxQddkXo37uXWRKIc7XkLT5MERUcQI/FgUhaQhLcMrZLwP2H+t1e+ylDT4MiwcwS8Y++AV+GmsiTQ52PWGAx1FusW2t3yxQgXrguGpZISyplMaOiCabJs4qUK9CnWTKNUTqTmD+6BgOvMCaByeMYgtZH7qsjMQ55GHcUqHT7o3//cEVdhlCXdFOXRALBJGPWatL/JyWcnpSb06wxAZo/jGu1yvnEGi6vCC/pM3O/rEE4HMR6smvF1qr5n7YentbWHB3qv4u3X5xhaV1bwVd01x8KNM1Pf1VkDalsXldL3AwLZyiUgcO0Gsh73axa4Q8NAHj4xZ3VRD2eCJ4OPbWr7G6rKAHeoQCxH+S/lR3mjCKP8pgY67CUw+blw29NaYz3JQqCQyV31e8JyNn/t8jCJCvcKSYBpZ7Csuzw/Togz0s8dzzIl7BDgLYsJonu7S/c3efT8fp3jGQ0tAD7vzBYnXMoVsi59Kz1W+bkIU/SqOJvWY4PFFEdSWsQm4YKJDA4RuMCG/hphI4b0zlvcqa3Qd8ssiOuz4tLG8uFwaihA=
+  - secure: GR+4xxYV7XaavYdSXbeHjEWAgHt0YZFPNg2sVZ/43UiZilrYf7BVYk4RlPemzoth0h3hU7I5JpHyLtXTGgQhL3rTYmWznKOVXIpQ7C+jU6SFdsaYtwVltUL0W4jt0PrW2z18IXklXl7KefQkBrIURTtFeEudsncUd1/zCsw/OOQlfOj5i+hUMHnBmiHfZSS3+v1LIACBWGGaJ6k8ZV4ZJh4/SQtdh/9aqYD4piRKRZz9fwJaiLgPB380NX5q+LzPrMwFIxBet+cY5ORoFEfph/I/qQVBwIexXJiGsFiAwogLODyNGLrLTrEUuDzDpxhb0eQdR+OYt6GTVwfte9XB9XUHLjHDBDSRAOkYt+lBGmd5pkgsnOApKl7dw9IpsGkqnFV0tpPCQaN3wJOuOF15AbCQjXTMmkF3cd4ZZoNGaZJ/MHXxXi57zf3908n63Rl5pZ7cPxCHzdjYe83DLQziVo8XH4y0o5Nl+oVEiAJhoPguPodVdEZxCCTA/P+rVbtdOD/VXBTAmHlu7B5/wJVdUCG3/JvXLSChzogbQcgL+ioBvbQAc7V5g7eBIkN5tMvdIioVfU/it64lTK6RJMBGs4/xzbxh0CpNTjGU6hLcKv0sA47eZpbVdXIcAvD8Ft3G1E3bN6lDq9OQSb0os5L2oUXUs3QazwuBf62FcrUEXqg=
+script:
+ - ./gradlew build
+deploy:
+  provider: script
+  script: ./gradlew publish bintrayUpload
+  on:
+    tags: true
+    branch: master
 
