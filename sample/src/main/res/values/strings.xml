@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SerializedRX Sample</string>
+    <string name="get_permission_with_rationale">Get permission with rationale</string>
+    <string name="get_location_permission_rationale">Get location + (enabling locationsettings and permissions) + rationale</string>
+    <string name="get_login_token">Get login token</string>
 </resources>

@@ -4,10 +4,20 @@ import android.Manifest;
 import android.accounts.Account;
 import android.app.Activity;
 import android.content.Context;
+import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
+
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.Api;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.plus.Plus;
+
+import junit.framework.Assert;
 
 import no.finn.android.rx.BaseStateObservable;
 import no.finn.android.rx.GetPermissionObservable;
@@ -17,15 +27,6 @@ import no.finn.android.rx.PlayServicesBaseObservable;
 import no.finn.android.rx.RxState;
 import no.finn.android.rx.RxStateRestart;
 import no.finn.android.rx.UserAbortedException;
-
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.common.Scopes;
-import com.google.android.gms.common.api.Api;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.plus.Plus;
-import junit.framework.Assert;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -34,7 +35,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class CustomStateObserverExampleButton extends Button implements View.OnClickListener, RxStateRestart {
+public class CustomStateObserverExampleButton extends AppCompatButton implements View.OnClickListener, RxStateRestart {
     private static final String GOOGLE_PLUS_SCOPES = Scopes.PLUS_LOGIN + " " + "email";
     private final RxState state;
 
