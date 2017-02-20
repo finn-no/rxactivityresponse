@@ -5,7 +5,9 @@ apply plugin: 'com.android.application'
 dependencies {
     compile project(':rxactivityresponse')
     compile project(':rxactivityresponse-playservices')
-    compile('io.reactivex:rxandroid:0.24.0')
+
+    compile('io.reactivex:rxandroid:1.2.1')
+    compile('io.reactivex:rxjava:1.1.9')
     compile('com.android.support:design:25.1.0')
     compile('com.google.android.gms:play-services-identity:10.0.1')
     compile('com.google.android.gms:play-services-plus:10.0.1')
