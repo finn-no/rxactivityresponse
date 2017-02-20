@@ -17,6 +17,10 @@ public class RxState implements Parcelable {
     private WeakReference<RxStateRestart> rxContinueRef;
     private String currentRequest = null;
 
+    public static RxState get(Context context, int requestCode) {
+        return get(context, requestCode, (WeakReference<RxStateRestart>) null);
+    }
+
     public static RxState get(Context context, int requestCode, RxStateRestart rxContinue) {
         return get(context, requestCode, new WeakReference<>(rxContinue));
     }
@@ -66,11 +70,13 @@ public class RxState implements Parcelable {
     }
 
     private void rxContinueAction(int requestCode) {
-        RxStateRestart rxStateRestart = rxContinueRef.get();
-        if (rxStateRestart == null) {
-            throw new IllegalStateException("rxContinue is null - did you make the weak reference an inner class instead of your request object?");
+        if (rxContinueRef != null && rxContinueRef.get() != null) {
+            RxStateRestart rxStateRestart = rxContinueRef.get();
+//            if (rxStateRestart == null) {
+//                throw new IllegalStateException("rxContinue is null - did you make the weak reference an inner class instead of your request object?");
+//            }
+            rxStateRestart.rxAction(requestCode);
         }
-        rxStateRestart.rxAction(requestCode);
     }
 
     public void recieve(String requestName) {

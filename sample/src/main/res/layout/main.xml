@@ -23,5 +23,11 @@
         android:layout_height="wrap_content"
         android:text="@string/get_login_token"/>
 
+    <no.finn.rxactivityresponse.sample.ContextualPermissionButton
+        android:id="@+id/contextualbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/get_permission_w_contextual_function"/>
+
 </LinearLayout>
 

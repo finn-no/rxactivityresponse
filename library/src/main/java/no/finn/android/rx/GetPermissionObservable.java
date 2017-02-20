@@ -23,6 +23,10 @@ public class GetPermissionObservable extends BaseStateObservable<Boolean> implem
 
     @Override
     public void call(Subscriber<? super Boolean> subscriber) {
+        if (subscriber.isUnsubscribed()) {
+            return;
+        }
+
         if (permissionResult.granted) {
             subscriber.onNext(true);
             subscriber.onCompleted();

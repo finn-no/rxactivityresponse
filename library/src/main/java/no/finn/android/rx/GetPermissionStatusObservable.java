@@ -17,11 +17,15 @@ public class GetPermissionStatusObservable implements Observable.OnSubscribe<Per
 
     @Override
     public void call(Subscriber<? super PermissionResult> subscriber) {
+        if (subscriber.isUnsubscribed()) {
+            return;
+        }
+
         boolean showRationale = false;
         int[] grantResults = new int[permissions.length];
         for (int i = 0; i < permissions.length; i++) {
             grantResults[i] = ActivityCompat.checkSelfPermission(activity, permissions[i]);
-            showRationale = ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[i]);
+            showRationale |= ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[i]);
         }
         subscriber.onNext(new PermissionResult(permissions, grantResults, showRationale));
         subscriber.onCompleted();
