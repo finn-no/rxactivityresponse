@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RxState implements Parcelable {
-    private WeakReference<RxStateRestart> rxContinueRef;
-
     public final int requestCode;
+
     private final Map<String, RequestPermissionState> permissionResults;
     private final Map<String, ActivityResultState> activityResults;
+    private WeakReference<RxStateRestart> rxContinueRef;
     private String currentRequest = null;
 
     public static RxState get(Context context, int requestCode, RxStateRestart rxContinue) {
@@ -28,14 +28,9 @@ public class RxState implements Parcelable {
             result = new RxState(requestCode);
             delegate.putState(requestCode, result);
         }
-        return result.withContinue(rxContinueRef);
+        result.rxContinueRef = rxContinueRef;
+        return result;
     }
-
-    public RxState withContinue(WeakReference<RxStateRestart> rxContinueRef) {
-        this.rxContinueRef = rxContinueRef;
-        return this;
-    }
-
 
     private RxState(int requestCode) {
         this.requestCode = requestCode;
