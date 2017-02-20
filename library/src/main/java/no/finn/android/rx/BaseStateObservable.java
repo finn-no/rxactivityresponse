@@ -45,7 +45,7 @@ public abstract class BaseStateObservable<T> implements Observable.OnSubscribe<T
 
         @Override
         public Observable<T> call(Observable<T> observable) {
-            return observable.finallyDo(new Action0() {
+            return observable.doAfterTerminate(new Action0() {
                 @Override
                 public void call() {
                     state.reset();

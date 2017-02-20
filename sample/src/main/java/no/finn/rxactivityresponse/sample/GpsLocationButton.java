@@ -3,21 +3,22 @@ package no.finn.rxactivityresponse.sample;
 import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
+import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
+
+import com.google.android.gms.location.LocationRequest;
+
+import junit.framework.Assert;
 
 import no.finn.android.rx.RxPermissionRationale;
 import no.finn.android.rx.RxPlayServices;
 import no.finn.android.rx.RxState;
 import no.finn.android.rx.RxStateRestart;
-
-import com.google.android.gms.location.LocationRequest;
-import junit.framework.Assert;
 import rx.functions.Action1;
 
-public class GpsLocationButton extends Button implements View.OnClickListener, RxStateRestart {
+public class GpsLocationButton extends AppCompatButton implements View.OnClickListener, RxStateRestart {
     private final RxState rxState;
 
     public GpsLocationButton(Context context, AttributeSet attrs) {
