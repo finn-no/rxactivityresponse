@@ -69,9 +69,9 @@ public class CustomStateObserverExampleButton extends AppCompatButton implements
                 @Override
                 public void call(Subscriber<? super String> subscriber) {
                     //noinspection MissingPermission
-                    String accountName = Plus.AccountApi.getAccountName(client);
-                    Account account = new Account(accountName, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
-                    String scopes = "oauth2:" + GOOGLE_PLUS_SCOPES;
+                    final String accountName = Plus.AccountApi.getAccountName(client);
+                    final Account account = new Account(accountName, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
+                    final String scopes = "oauth2:" + GOOGLE_PLUS_SCOPES;
                     try {
                         subscriber.onNext(GoogleAuthUtil.getToken(activity.getApplicationContext(), account, scopes));
                         resetClientForDemoPurposes(client);
@@ -112,12 +112,12 @@ public class CustomStateObserverExampleButton extends AppCompatButton implements
     public void rxAction(int requestCode) {
         Assert.assertEquals(requestCode, ActivityResponses.GET_LOGINTOKEN);
         final Activity activity = (Activity) getContext();
-        String[] permissions = new String[]{Manifest.permission.GET_ACCOUNTS};
+        final String[] permissions = new String[]{Manifest.permission.GET_ACCOUNTS};
 
         final Scope[] scopes = {new Scope(Scopes.PROFILE), new Scope(Scopes.EMAIL)};
 
         // NB : Rationale is optional and can be null
-        SnackbarRationaleOperator rationaleOperator = new SnackbarRationaleOperator(this, "Need permission for ...");
+        final SnackbarRationaleOperator rationaleOperator = new SnackbarRationaleOperator(this, "Need permission for ...");
 
         getLoginToken(activity, permissions, scopes, rationaleOperator)
                 .subscribe(new Action1<String>() {
@@ -133,7 +133,7 @@ public class CustomStateObserverExampleButton extends AppCompatButton implements
                 });
     }
 
-    private Observable<String> getLoginToken(final Activity activity, String[] permissions, final Scope[] scopes, final SnackbarRationaleOperator rationale) {
+    private Observable<String> getLoginToken(final Activity activity, final String[] permissions, final Scope[] scopes, final SnackbarRationaleOperator rationale) {
         // we cant use RxPermission.getPermission directly, as it triggers state.reset() mid flow.
         return Observable.create(new GetPermissionStatusObservable(activity, permissions))
                 .flatMap(new Func1<PermissionResult, Observable<Boolean>>() {

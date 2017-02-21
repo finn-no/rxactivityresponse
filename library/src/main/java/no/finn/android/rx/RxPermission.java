@@ -6,7 +6,7 @@ import rx.Observable;
 import rx.functions.Func1;
 
 public class RxPermission {
-    public static Observable<Boolean> getPermission(Activity activity, final RxState state, final String... permissions) {
+    public static Observable<Boolean> getPermission(final Activity activity, final RxState state, final String... permissions) {
         return getPermission(activity, state, null, permissions);
     }
 
@@ -20,7 +20,7 @@ public class RxPermission {
                 }).compose(new BaseStateObservable.EndStateTransformer<Boolean>(state));
     }
 
-    public static Observable<PermissionResult> getPermissionState(Activity activity, final String... permissions) {
+    public static Observable<PermissionResult> getPermissionState(final Activity activity, final String... permissions) {
         return Observable.create(new GetPermissionStatusObservable(activity, permissions));
     }
 }

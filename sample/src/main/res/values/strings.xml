@@ -4,5 +4,4 @@
     <string name="get_permission_with_rationale">Get permission with rationale</string>
     <string name="get_location_permission_rationale">Get location + (enabling locationsettings and permissions) + rationale</string>
     <string name="get_login_token">Get login token</string>
-    <string name="get_permission_w_contextual_function">Get permission w/contextual function</string>
 </resources>

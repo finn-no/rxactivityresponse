@@ -17,10 +17,6 @@ public class RxState implements Parcelable {
     private WeakReference<RxStateRestart> rxContinueRef;
     private String currentRequest = null;
 
-    public static RxState get(Context context, int requestCode) {
-        return get(context, requestCode, (WeakReference<RxStateRestart>) null);
-    }
-
     public static RxState get(Context context, int requestCode, RxStateRestart rxContinue) {
         return get(context, requestCode, new WeakReference<>(rxContinue));
     }
