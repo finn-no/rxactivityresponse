@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/finn-no/rxactivityresponse.svg?branch=master)](https://travis-ci.org/finn-no/rxactivityresponse)
+[![Download](https://api.bintray.com/packages/finnandroid/maven/rxactivityresponse/images/download.svg)](https://bintray.com/finnandroid/maven/rxactivityresponse/_latestVersion)
 # RxActivityResponse
 
 ## About
