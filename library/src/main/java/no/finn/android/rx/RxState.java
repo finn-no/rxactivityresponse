@@ -26,11 +26,10 @@ public class RxState implements Parcelable {
     }
 
     public static RxState get(Context context, int requestCode, WeakReference<RxStateRestart> rxContinueRef) {
-        final RxActivityStateDelegate delegate = RxActivityStateDelegate.get(context);
-        RxState result = delegate.getState(requestCode);
+        RxState result = RxActivityResponse.get(context).getState(requestCode);
         if (result == null) {
             result = new RxState(requestCode);
-            delegate.putState(requestCode, result);
+            RxActivityResponse.get(context).putState(requestCode, result);
         }
         result.rxContinueRef = rxContinueRef;
         return result;
@@ -72,9 +71,9 @@ public class RxState implements Parcelable {
     private void rxContinueAction(int requestCode) {
         if (rxContinueRef != null && rxContinueRef.get() != null) {
             RxStateRestart rxStateRestart = rxContinueRef.get();
-//            if (rxStateRestart == null) {
-//                throw new IllegalStateException("rxContinue is null - did you make the weak reference an inner class instead of your request object?");
-//            }
+            if (rxStateRestart == null) {
+                throw new IllegalStateException("rxContinue is null - did you make the weak reference an inner class instead of your request object?");
+            }
             rxStateRestart.rxAction(requestCode);
         }
     }
@@ -106,7 +105,7 @@ public class RxState implements Parcelable {
         @SuppressWarnings("unchecked")
         public RxState createFromParcel(Parcel in) {
             return new RxState(in.readInt(), in.readString(),
-                    in.readHashMap(RequestPermissionState.class.getClassLoader()), in.readHashMap(ActivityResultState.class.getClassLoader()));
+                in.readHashMap(RequestPermissionState.class.getClassLoader()), in.readHashMap(ActivityResultState.class.getClassLoader()));
         }
 
         public RxState[] newArray(int size) {

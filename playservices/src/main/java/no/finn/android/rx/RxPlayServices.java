@@ -13,6 +13,7 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+
 import rx.Observable;
 import rx.functions.Func1;
 
