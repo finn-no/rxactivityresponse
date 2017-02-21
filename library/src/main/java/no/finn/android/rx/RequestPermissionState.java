@@ -35,7 +35,9 @@ public class RequestPermissionState implements Parcelable {
 
     public static final Creator<RequestPermissionState> CREATOR = new Creator<RequestPermissionState>() {
         public RequestPermissionState createFromParcel(Parcel in) {
-            return new RequestPermissionState(in.createStringArray(), in.createIntArray());
+            final String[] permissions = in.createStringArray();
+            final int[] grantResults = in.createIntArray();
+            return new RequestPermissionState(permissions, grantResults);
         }
 
         public RequestPermissionState[] newArray(int size) {

@@ -104,8 +104,11 @@ public class RxState implements Parcelable {
     public static final Creator<RxState> CREATOR = new Creator<RxState>() {
         @SuppressWarnings("unchecked")
         public RxState createFromParcel(Parcel in) {
-            return new RxState(in.readInt(), in.readString(),
-                in.readHashMap(RequestPermissionState.class.getClassLoader()), in.readHashMap(ActivityResultState.class.getClassLoader()));
+            final int requestCode = in.readInt();
+            final String currentRequest = in.readString();
+            final HashMap permissionResults = in.readHashMap(RequestPermissionState.class.getClassLoader());
+            final HashMap activityResults = in.readHashMap(ActivityResultState.class.getClassLoader());
+            return new RxState(requestCode, currentRequest, permissionResults, activityResults);
         }
 
         public RxState[] newArray(int size) {
