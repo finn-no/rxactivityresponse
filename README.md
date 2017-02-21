@@ -21,6 +21,7 @@ public class ExampleView extends View {
        void useLocation(location) {
            ...
        }
+   }
 }
 ```
 
@@ -31,9 +32,9 @@ public class ExampleView extends View {
 ### Our solution
 Install RxActivityResponse in your activity. This is a simple deal:
 ```java
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(RxActivityResponse.install(this, newBase));
+@Override
+protected void attachBaseContext(Context newBase) {
+    super.attachBaseContext(RxActivityResponse.install(this, newBase));
 }
 ```
 
