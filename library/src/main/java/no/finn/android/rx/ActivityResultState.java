@@ -27,8 +27,9 @@ public class ActivityResultState implements Parcelable {
 
     public static final Creator<ActivityResultState> CREATOR = new Creator<ActivityResultState>() {
         public ActivityResultState createFromParcel(Parcel in) {
-            final Intent parcelable = in.readParcelable(Intent.class.getClassLoader());
-            return new ActivityResultState(in.readInt(), parcelable);
+            final int resultCode = in.readInt();
+            final Intent intent = in.readParcelable(Intent.class.getClassLoader());
+            return new ActivityResultState(resultCode, intent);
         }
 
         public ActivityResultState[] newArray(int size) {
