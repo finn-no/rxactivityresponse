@@ -31,13 +31,7 @@ public class ExampleView extends View {
 2. `onSaveInstanceState` might be triggered if the user rotates during the request, or if device is memory pressured during `onActivityResult`. This means the view we're subscribing from no longer exists.
 
 ### Our solution
-Install RxActivityResponse in your activity. This is a simple deal:
-```java
-@Override
-protected void attachBaseContext(Context newBase) {
-    super.attachBaseContext(RxActivityResponse.install(this, newBase));
-}
-```
+Implement all activity delegate calls. This should be a small one time job, see https://github.com/finn-no/rxactivityresponse/blob/master/sample/src/main/java/no/finn/rxactivityresponse/sample/SerializedRxSampleActivity.java .
 
 Then in you request object do something like this:
 

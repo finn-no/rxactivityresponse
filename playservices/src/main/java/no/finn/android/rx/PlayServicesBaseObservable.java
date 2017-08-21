@@ -8,7 +8,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
-
 import rx.Subscriber;
 import rx.functions.Action0;
 import rx.subscriptions.Subscriptions;
