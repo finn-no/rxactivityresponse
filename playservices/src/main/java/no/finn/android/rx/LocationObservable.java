@@ -8,7 +8,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import rx.Subscriber;
+
+import io.reactivex.ObservableEmitter;
 
 public class LocationObservable extends LocationSettingsObservable<Location> {
     private LocationListener locationListener = null;
@@ -28,14 +29,14 @@ public class LocationObservable extends LocationSettingsObservable<Location> {
     }
 
     @Override
-    protected void locationSettingSuccess(final Subscriber<? super Location> subscriber, GoogleApiClient client) {
+    protected void locationSettingSuccess(final ObservableEmitter<Location> emitter, GoogleApiClient client) {
         this.client = client;
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                subscriber.onNext(location);
+                emitter.onNext(location);
                 if (locationRequest.getNumUpdates() == 1) {
-                    subscriber.onCompleted();
+                    emitter.onComplete();
                 }
             }
         };

@@ -3,9 +3,9 @@ package no.finn.android.rx;
 import android.app.Activity;
 import android.support.v4.app.ActivityCompat;
 
-import rx.Subscriber;
-import rx.functions.Action0;
-import rx.subscriptions.Subscriptions;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.functions.Cancellable;
+
 
 public class GetPermissionObservable extends BaseStateObservable<Boolean> implements RxPermissionRationale.RequestPermission {
     private static final String STATE_NAME = "GetPermission";
@@ -22,29 +22,29 @@ public class GetPermissionObservable extends BaseStateObservable<Boolean> implem
     }
 
     @Override
-    public void call(Subscriber<? super Boolean> subscriber) {
-        if (subscriber.isUnsubscribed()) {
+    public void subscribe(ObservableEmitter<Boolean> emitter) {
+        if (emitter.isDisposed()) {
             return;
         }
 
         if (permissionResult.granted) {
-            subscriber.onNext(true);
-            subscriber.onCompleted();
+            emitter.onNext(true);
+            emitter.onComplete();
         } else {
             if (permissionRequestDenied(STATE_NAME)) {
-                subscriber.onNext(false);
-                subscriber.onCompleted();
+                emitter.onNext(false);
+                emitter.onComplete();
             } else {
                 if (rationale != null && (permissionResult.showRationale || rationale.alwaysShowRationale)) {
-                    subscriber.add(Subscriptions.create(new Action0() {
+                    emitter.setCancellable(new Cancellable() {
                         @Override
-                        public void call() {
+                        public void cancel() throws Exception {
                             if (rationaleActive) {
                                 rationale.onUnsubscribe();
                                 rationaleActive = false;
                             }
                         }
-                    }));
+                    });
                     rationaleActive = true;
                     rationale.showRationale(this);
                 } else {

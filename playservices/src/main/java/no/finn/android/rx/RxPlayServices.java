@@ -13,22 +13,23 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import rx.Observable;
-import rx.functions.Func1;
+
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 public class RxPlayServices {
     @SafeVarargs
     public static Observable<GoogleApiClient> getPlayServices(final Activity activity, final RxState state, final String[] permissions, final RxPermissionRationale rationale, final Scope[] scopes, final Api<? extends Api.ApiOptions.NotRequiredOptions>... services) {
         return Observable.create(new GetPermissionStatusObservable(activity, permissions))
-                .flatMap(new Func1<PermissionResult, Observable<Boolean>>() {
+                .flatMap(new Function<PermissionResult, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> call(PermissionResult permissionResult) {
+                    public Observable<Boolean> apply(PermissionResult permissionResult) {
                         return Observable.create(new GetPermissionObservable(activity, state, rationale, permissionResult));
                     }
                 })
-                .flatMap(new Func1<Boolean, Observable<GoogleApiClient>>() {
+                .flatMap(new Function<Boolean, Observable<GoogleApiClient>>() {
                     @Override
-                    public Observable<GoogleApiClient> call(Boolean granted) {
+                    public Observable<GoogleApiClient> apply(Boolean granted) {
                         if (granted) {
                             return Observable.create(new PlayServicesObservable(activity, state, scopes, services));
                         }
@@ -40,15 +41,15 @@ public class RxPlayServices {
     public static Observable<Location> getLocation(final Activity activity, final RxPermissionRationale rationale, final LocationRequest locationRequest, final RxState state) {
         String[] permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
         return Observable.create(new GetPermissionStatusObservable(activity, permissions))
-                .flatMap(new Func1<PermissionResult, Observable<Boolean>>() {
+                .flatMap(new Function<PermissionResult, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> call(PermissionResult permissionResult) {
+                    public Observable<Boolean> apply(PermissionResult permissionResult) {
                         return Observable.create(new GetPermissionObservable(activity, state, rationale, permissionResult));
                     }
                 })
-                .flatMap(new Func1<Boolean, Observable<Location>>() {
+                .flatMap(new Function<Boolean, Observable<Location>>() {
                     @Override
-                    public Observable<Location> call(Boolean granted) {
+                    public Observable<Location> apply(Boolean granted) {
                         if (granted) {
                             return Observable.create(new LocationObservable(activity, state, locationRequest, LocationServices.API));
                         }

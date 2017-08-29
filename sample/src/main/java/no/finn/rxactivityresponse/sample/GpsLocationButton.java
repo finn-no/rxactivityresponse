@@ -12,11 +12,11 @@ import com.google.android.gms.location.LocationRequest;
 
 import junit.framework.Assert;
 
+import io.reactivex.functions.Consumer;
 import no.finn.android.rx.RxPermissionRationale;
 import no.finn.android.rx.RxPlayServices;
 import no.finn.android.rx.RxState;
 import no.finn.android.rx.RxStateRestart;
-import rx.functions.Action1;
 
 public class GpsLocationButton extends AppCompatButton implements View.OnClickListener, RxStateRestart {
     private final RxState rxState;
@@ -44,15 +44,15 @@ public class GpsLocationButton extends AppCompatButton implements View.OnClickLi
 
         // GetLocation fetches the required permission, turns on location stuff with the locationsetting api, then recieves a location
         RxPlayServices.getLocation((Activity) getContext(), rationaleOperator, locationRequest, rxState)
-                .subscribe(new Action1<Location>() {
+                .subscribe(new Consumer<Location>() {
                     @Override
-                    public void call(Location location) {
+                    public void accept(Location location) {
                         //NB : if setNumUpdates != 0 you need to make sure you unsubscribe from the subscription!
                         Toast.makeText(getContext(), "Got a location " + location.toString(), Toast.LENGTH_LONG).show();
                     }
-                }, new Action1<Throwable>() {
+                }, new Consumer<Throwable>() {
                     @Override
-                    public void call(Throwable throwable) {
+                    public void accept(Throwable throwable) {
                         Toast.makeText(getContext(), "Exception : " + throwable, Toast.LENGTH_SHORT).show();
                     }
                 });

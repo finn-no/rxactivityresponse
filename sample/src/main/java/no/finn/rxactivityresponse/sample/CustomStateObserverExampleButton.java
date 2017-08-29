@@ -19,6 +19,14 @@ import com.google.android.gms.plus.Plus;
 
 import junit.framework.Assert;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import no.finn.android.rx.BaseStateObservable;
 import no.finn.android.rx.GetPermissionObservable;
 import no.finn.android.rx.GetPermissionStatusObservable;
@@ -27,13 +35,6 @@ import no.finn.android.rx.PlayServicesBaseObservable;
 import no.finn.android.rx.RxState;
 import no.finn.android.rx.RxStateRestart;
 import no.finn.android.rx.UserAbortedException;
-import rx.Observable;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 public class CustomStateObserverExampleButton extends AppCompatButton implements View.OnClickListener, RxStateRestart {
     private static final String GOOGLE_PLUS_SCOPES = Scopes.PLUS_LOGIN + " " + "email";
@@ -59,15 +60,15 @@ public class CustomStateObserverExampleButton extends AppCompatButton implements
         }
 
         @Override
-        public void onGoogleApiClientReady(final Subscriber<? super String> subscriber, final GoogleApiClient client) {
+        public void onGoogleApiClientReady(final ObservableEmitter<String> emitter, final GoogleApiClient client) {
             if (activityResultCanceled(STATE_NAME)) {
                 // always check and handle responses after recieveStateResponse
-                subscriber.onError(new GoogleLoginCanceledException());
+                emitter.onError(new GoogleLoginCanceledException());
                 return;
             }
-            final Subscription s = Observable.create(new Observable.OnSubscribe<String>() {
+            final Disposable disposable = Observable.create(new ObservableOnSubscribe<String>() {
                 @Override
-                public void call(Subscriber<? super String> subscriber) {
+                public void subscribe(ObservableEmitter<String> subscriber) {
                     //noinspection MissingPermission
                     final String accountName = Plus.AccountApi.getAccountName(client);
                     final Account account = new Account(accountName, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
@@ -75,31 +76,31 @@ public class CustomStateObserverExampleButton extends AppCompatButton implements
                     try {
                         subscriber.onNext(GoogleAuthUtil.getToken(activity.getApplicationContext(), account, scopes));
                         resetClientForDemoPurposes(client);
-                        subscriber.onCompleted();
+                        subscriber.onComplete();
                     } catch (Exception e) {
                         subscriber.onError(e);
                     }
                 }
             }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Action1<String>() {
+                    .subscribe(new Consumer<String>() {
                         @Override
-                        public void call(String s) {
-                            subscriber.onNext(s);
+                        public void accept(String s) {
+                            emitter.onNext(s);
                         }
-                    }, new Action1<Throwable>() {
+                    }, new Consumer<Throwable>() {
                         @Override
-                        public void call(Throwable throwable) {
+                        public void accept(Throwable throwable) {
                             if (throwable instanceof UserRecoverableAuthException) {
                                 // always trigger recieveStateResponse before startActivityForResult (or permission...)
                                 recieveStateResponse(STATE_NAME);
                                 activity.startActivityForResult(((UserRecoverableAuthException) throwable).getIntent(), getRequestCode());
-                                subscriber.onCompleted();
+                                emitter.onComplete();
                             } else {
-                                subscriber.onError(throwable);
+                                emitter.onError(throwable);
                             }
                         }
                     });
-            subscriber.add(s);
+            emitter.setDisposable(disposable);
         }
 
 
@@ -120,14 +121,14 @@ public class CustomStateObserverExampleButton extends AppCompatButton implements
         final SnackbarRationaleOperator rationaleOperator = new SnackbarRationaleOperator(this, "Need permission for ...");
 
         getLoginToken(activity, permissions, scopes, rationaleOperator)
-                .subscribe(new Action1<String>() {
+                .subscribe(new Consumer<String>() {
                     @Override
-                    public void call(String s) {
+                    public void accept(String s) {
                         Toast.makeText(getContext(), "Token is : " + s, Toast.LENGTH_SHORT).show();
                     }
-                }, new Action1<Throwable>() {
+                }, new Consumer<Throwable>() {
                     @Override
-                    public void call(Throwable throwable) {
+                    public void accept(Throwable throwable) {
                         Toast.makeText(getContext(), "Exception : " + throwable, Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -136,15 +137,15 @@ public class CustomStateObserverExampleButton extends AppCompatButton implements
     private Observable<String> getLoginToken(final Activity activity, final String[] permissions, final Scope[] scopes, final SnackbarRationaleOperator rationale) {
         // we cant use RxPermission.getPermission directly, as it triggers state.reset() mid flow.
         return Observable.create(new GetPermissionStatusObservable(activity, permissions))
-                .flatMap(new Func1<PermissionResult, Observable<Boolean>>() {
+                .flatMap(new Function<PermissionResult, Observable<Boolean>>() {
                     @Override
-                    public Observable<Boolean> call(PermissionResult permissionResult) {
+                    public Observable<Boolean> apply(PermissionResult permissionResult) {
                         return Observable.create(new GetPermissionObservable(activity, state, rationale, permissionResult));
                     }
                 })
-                .flatMap(new Func1<Boolean, Observable<String>>() {
+                .flatMap(new Function<Boolean, Observable<String>>() {
                     @Override
-                    public Observable<String> call(Boolean granted) {
+                    public Observable<String> apply(Boolean granted) {
                         if (granted) {
                             return Observable.create(new GoogleLoginObservable(activity, state, scopes, Plus.API))
                                     .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread());

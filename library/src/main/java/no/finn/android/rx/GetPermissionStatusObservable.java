@@ -3,10 +3,11 @@ package no.finn.android.rx;
 import android.app.Activity;
 import android.support.v4.app.ActivityCompat;
 
-import rx.Observable;
-import rx.Subscriber;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 
-public class GetPermissionStatusObservable implements Observable.OnSubscribe<PermissionResult> {
+
+public class GetPermissionStatusObservable implements ObservableOnSubscribe<PermissionResult> {
     private final Activity activity;
     private final String[] permissions;
 
@@ -16,8 +17,8 @@ public class GetPermissionStatusObservable implements Observable.OnSubscribe<Per
     }
 
     @Override
-    public void call(Subscriber<? super PermissionResult> subscriber) {
-        if (subscriber.isUnsubscribed()) {
+    public void subscribe(ObservableEmitter<PermissionResult> subscriber) {
+        if (subscriber.isDisposed()) {
             return;
         }
 
@@ -28,6 +29,6 @@ public class GetPermissionStatusObservable implements Observable.OnSubscribe<Per
             showRationale |= ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[i]);
         }
         subscriber.onNext(new PermissionResult(permissions, grantResults, showRationale));
-        subscriber.onCompleted();
+        subscriber.onComplete();
     }
 }

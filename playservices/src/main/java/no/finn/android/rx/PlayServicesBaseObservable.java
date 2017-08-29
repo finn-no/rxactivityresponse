@@ -8,9 +8,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
-import rx.Subscriber;
-import rx.functions.Action0;
-import rx.subscriptions.Subscriptions;
+
+import io.reactivex.ObservableEmitter;
+import io.reactivex.functions.Cancellable;
 
 //NB : all connection responses will come back on the main thread!
 public abstract class PlayServicesBaseObservable<T> extends BaseStateObservable<T> {
@@ -33,7 +33,7 @@ public abstract class PlayServicesBaseObservable<T> extends BaseStateObservable<
         this.services = services;
     }
 
-    public abstract void onGoogleApiClientReady(Subscriber<? super T> subscriber, GoogleApiClient client);
+    public abstract void onGoogleApiClientReady(ObservableEmitter<T> emitter, GoogleApiClient client);
 
     public void onUnsubscribe() {
         disconnect();
@@ -46,9 +46,9 @@ public abstract class PlayServicesBaseObservable<T> extends BaseStateObservable<
     }
 
     @Override
-    public void call(final Subscriber<? super T> subscriber) {
+    public void subscribe(final ObservableEmitter<T> emitter) {
         if (activityResultCanceled(STATE_NAME)) {
-            subscriber.onError(new PlayServicesConnectionCanceledException());
+            emitter.onError(new PlayServicesConnectionCanceledException());
             return;
         }
         GoogleApiClient.Builder builder = new GoogleApiClient.Builder(activity);
@@ -63,40 +63,40 @@ public abstract class PlayServicesBaseObservable<T> extends BaseStateObservable<
         builder.addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
             @Override
             public void onConnected(Bundle bundle) {
-                onGoogleApiClientReady(subscriber, client);
+                onGoogleApiClientReady(emitter, client);
             }
 
             @Override
             public void onConnectionSuspended(int reason) {
-                subscriber.onError(new GoogleApiConnectionSuspended(reason));
+                emitter.onError(new GoogleApiConnectionSuspended(reason));
             }
         });
         builder.addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
             @Override
             public void onConnectionFailed(final ConnectionResult connectionResult) {
                 if (connectionResult.hasResolution()) {
-                    resolveConnectionFailed(connectionResult, subscriber);
+                    resolveConnectionFailed(connectionResult, emitter);
                 } else {
-                    subscriber.onError(new GoogleApiConnectionFailed(connectionResult));
+                    emitter.onError(new GoogleApiConnectionFailed(connectionResult));
                 }
             }
         });
         client = builder.build();
         client.connect();
-        subscriber.add(Subscriptions.create(new Action0() {
+        emitter.setCancellable(new Cancellable() {
             @Override
-            public void call() {
+            public void cancel() throws Exception {
                 onUnsubscribe();
             }
-        }));
+        });
     }
 
-    protected void resolveConnectionFailed(ConnectionResult connectionResult, Subscriber<?> subscriber) {
+    protected void resolveConnectionFailed(ConnectionResult connectionResult, ObservableEmitter<?> emitter) {
         try {
             recieveStateResponse(STATE_NAME);
             connectionResult.startResolutionForResult(activity, getRequestCode());
         } catch (IntentSender.SendIntentException e) {
-            subscriber.onError(new GoogleApiConnectionFailed(e));
+            emitter.onError(new GoogleApiConnectionFailed(e));
         }
     }
 

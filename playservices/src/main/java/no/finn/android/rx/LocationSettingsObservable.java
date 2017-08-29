@@ -13,7 +13,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import rx.Subscriber;
+
+import io.reactivex.ObservableEmitter;
 
 public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObservable<T> {
     private static final String STATE_NAME = "LocationSettings";
@@ -25,13 +26,13 @@ public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObse
     }
 
     @Override
-    public void onGoogleApiClientReady(Subscriber<? super T> subscriber, GoogleApiClient client) {
-        handleLocationSettings(subscriber, client);
+    public void onGoogleApiClientReady(ObservableEmitter<T> emitter, GoogleApiClient client) {
+        handleLocationSettings(emitter, client);
     }
 
-    private void handleLocationSettings(final Subscriber<? super T> subscriber, final GoogleApiClient client) {
+    private void handleLocationSettings(final ObservableEmitter<T> emitter, final GoogleApiClient client) {
         if (activityResultCanceled(STATE_NAME)) {
-            subscriber.onError(new LocationSettingDeniedException());
+            emitter.onError(new LocationSettingDeniedException());
             return;
         }
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -45,21 +46,21 @@ public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObse
                 final Status status = result.getStatus();
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
-                        locationSettingSuccess(subscriber, client);
+                        locationSettingSuccess(emitter, client);
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        resolveResolutionRequired(subscriber, status);
-                        subscriber.unsubscribe(); // silently close our api connection, full restart through responsehandler required, so we can close this connection.
+                        resolveResolutionRequired(emitter, status);
+                        emitter.onComplete();  // silently close our api connection, full restart through responsehandler required, so we can close this connection.
                         break;
                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        subscriber.onError(new RxPlayServices.RxLocationError(LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE));
+                        emitter.onError(new RxPlayServices.RxLocationError(LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE));
                         break;
                 }
             }
         });
     }
 
-    protected void resolveResolutionRequired(Subscriber<? super T> subscriber, Status status) {
+    protected void resolveResolutionRequired(ObservableEmitter<T> subscriber, Status status) {
         recieveStateResponse(STATE_NAME);
         try {
             status.startResolutionForResult(activity, getRequestCode());
@@ -68,7 +69,7 @@ public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObse
         }
     }
 
-    protected abstract void locationSettingSuccess(Subscriber<? super T> subscriber, GoogleApiClient client);
+    protected abstract void locationSettingSuccess(ObservableEmitter<T> subscriber, GoogleApiClient client);
 
     public static class LocationSettingDeniedException extends UserAbortedException {
 

@@ -1,9 +1,11 @@
 package no.finn.android.rx;
 
-import rx.Observable;
-import rx.functions.Action0;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.functions.Action;
 
-public abstract class BaseStateObservable<T> implements Observable.OnSubscribe<T> {
+public abstract class BaseStateObservable<T> implements ObservableOnSubscribe<T> {
     protected final RxState state;
 
     public BaseStateObservable(RxState state) {
@@ -36,7 +38,7 @@ public abstract class BaseStateObservable<T> implements Observable.OnSubscribe<T
         return activityResult != null && activityResult.resultCanceled();
     }
 
-    public static class EndStateTransformer<T> implements Observable.Transformer<T, T> {
+    public static class EndStateTransformer<T> implements ObservableTransformer<T, T> {
         private final RxState state;
 
         public EndStateTransformer(RxState state) {
@@ -44,10 +46,10 @@ public abstract class BaseStateObservable<T> implements Observable.OnSubscribe<T
         }
 
         @Override
-        public Observable<T> call(Observable<T> observable) {
-            return observable.doAfterTerminate(new Action0() {
+        public Observable<T> apply(Observable<T> observable) {
+            return observable.doAfterTerminate(new Action() {
                 @Override
-                public void call() {
+                public void run() {
                     state.reset();
                 }
             });

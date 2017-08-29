@@ -10,11 +10,11 @@ import android.widget.Toast;
 
 import junit.framework.Assert;
 
+import io.reactivex.functions.Consumer;
 import no.finn.android.rx.RxPermission;
 import no.finn.android.rx.RxPermissionRationale;
 import no.finn.android.rx.RxState;
 import no.finn.android.rx.RxStateRestart;
-import rx.functions.Action1;
 
 public class SimplePermissionButton extends AppCompatButton implements View.OnClickListener, RxStateRestart {
     private final RxState rxState;
@@ -40,14 +40,14 @@ public class SimplePermissionButton extends AppCompatButton implements View.OnCl
 
         final String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
         RxPermission.getPermission((Activity) getContext(), rxState, rationaleOperator, permissions)
-                .subscribe(new Action1<Boolean>() {
+                .subscribe(new Consumer<Boolean>() {
                     @Override
-                    public void call(Boolean granted) {
+                    public void accept(Boolean granted) {
                         Toast.makeText(getContext(), "Permission : " + granted, Toast.LENGTH_SHORT).show();
                     }
-                }, new Action1<Throwable>() {
+                }, new Consumer<Throwable>() {
                     @Override
-                    public void call(Throwable throwable) {
+                    public void accept(Throwable throwable) {
                         Toast.makeText(getContext(), "Exception : " + throwable, Toast.LENGTH_SHORT).show();
                     }
                 });
