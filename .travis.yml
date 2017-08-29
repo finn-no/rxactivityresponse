@@ -23,5 +23,5 @@ deploy:
   script: ./gradlew publish bintrayUpload
   on:
     tags: true
-    branch: master
+    branch: rxjava2
 
