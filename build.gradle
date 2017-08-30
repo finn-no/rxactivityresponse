@@ -1,6 +1,6 @@
 allprojects {
-    group = 'no.finn.rxactivityresponse2'
-    version = '0.6.0'
+    group = 'no.finn'
+    version = '1.0.0'
 }
 
 subprojects {
