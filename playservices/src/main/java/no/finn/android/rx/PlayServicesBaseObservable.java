@@ -9,8 +9,10 @@ import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 
+import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.functions.Cancellable;
+import io.reactivex.observers.ResourceObserver;
 
 //NB : all connection responses will come back on the main thread!
 public abstract class PlayServicesBaseObservable<T> extends BaseStateObservable<T> {
@@ -33,7 +35,7 @@ public abstract class PlayServicesBaseObservable<T> extends BaseStateObservable<
         this.services = services;
     }
 
-    public abstract void onGoogleApiClientReady(ObservableEmitter<T> emitter, GoogleApiClient client);
+    public abstract void onGoogleApiClientReady(ResourceObserver<T> emitter, GoogleApiClient client);
 
     public void onUnsubscribe() {
         disconnect();
@@ -63,7 +65,25 @@ public abstract class PlayServicesBaseObservable<T> extends BaseStateObservable<
         builder.addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
             @Override
             public void onConnected(Bundle bundle) {
-                onGoogleApiClientReady(emitter, client);
+                ResourceObserver<T> resourceObserver = new ResourceObserver<T>() {
+                    @Override
+                    public void onNext(T t) {
+                        emitter.onNext(t);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        emitter.onError(e);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        emitter.onComplete();
+                    }
+                };
+
+
+                onGoogleApiClientReady(resourceObserver, client);
             }
 
             @Override

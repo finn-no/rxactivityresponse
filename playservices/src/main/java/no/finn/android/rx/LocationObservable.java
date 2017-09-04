@@ -1,5 +1,6 @@
 package no.finn.android.rx;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.location.Location;
 
@@ -9,7 +10,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import io.reactivex.ObservableEmitter;
+import io.reactivex.observers.ResourceObserver;
 
 public class LocationObservable extends LocationSettingsObservable<Location> {
     private LocationListener locationListener = null;
@@ -28,8 +29,9 @@ public class LocationObservable extends LocationSettingsObservable<Location> {
         super.onUnsubscribe();
     }
 
+    @SuppressLint("MissingPermission")
     @Override
-    protected void locationSettingSuccess(final ObservableEmitter<Location> emitter, GoogleApiClient client) {
+    protected void locationSettingSuccess(final ResourceObserver<Location> emitter, GoogleApiClient client) {
         this.client = client;
         locationListener = new LocationListener() {
             @Override

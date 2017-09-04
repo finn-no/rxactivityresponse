@@ -14,7 +14,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 
-import io.reactivex.ObservableEmitter;
+import io.reactivex.observers.ResourceObserver;
 
 public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObservable<T> {
     private static final String STATE_NAME = "LocationSettings";
@@ -26,18 +26,18 @@ public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObse
     }
 
     @Override
-    public void onGoogleApiClientReady(ObservableEmitter<T> emitter, GoogleApiClient client) {
+    public void onGoogleApiClientReady(ResourceObserver<T> emitter, GoogleApiClient client) {
         handleLocationSettings(emitter, client);
     }
 
-    private void handleLocationSettings(final ObservableEmitter<T> emitter, final GoogleApiClient client) {
+    private void handleLocationSettings(final ResourceObserver<T> emitter, final GoogleApiClient client) {
         if (activityResultCanceled(STATE_NAME)) {
             emitter.onError(new LocationSettingDeniedException());
             return;
         }
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .setAlwaysShow(true)
-                .addLocationRequest(locationRequest);
+            .setAlwaysShow(true)
+            .addLocationRequest(locationRequest);
 
         PendingResult<LocationSettingsResult> pendingResult = LocationServices.SettingsApi.checkLocationSettings(client, builder.build());
         pendingResult.setResultCallback(new ResultCallback<LocationSettingsResult>() {
@@ -60,7 +60,7 @@ public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObse
         });
     }
 
-    protected void resolveResolutionRequired(ObservableEmitter<T> subscriber, Status status) {
+    protected void resolveResolutionRequired(ResourceObserver<T> subscriber, Status status) {
         recieveStateResponse(STATE_NAME);
         try {
             status.startResolutionForResult(activity, getRequestCode());
@@ -69,7 +69,7 @@ public abstract class LocationSettingsObservable<T> extends PlayServicesBaseObse
         }
     }
 
-    protected abstract void locationSettingSuccess(ObservableEmitter<T> subscriber, GoogleApiClient client);
+    protected abstract void locationSettingSuccess(ResourceObserver<T> subscriber, GoogleApiClient client);
 
     public static class LocationSettingDeniedException extends UserAbortedException {
 

@@ -26,6 +26,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.observers.ResourceObserver;
 import io.reactivex.schedulers.Schedulers;
 import no.finn.android.rx.BaseStateObservable;
 import no.finn.android.rx.GetPermissionObservable;
@@ -60,7 +61,7 @@ public class CustomStateObserverExampleButton extends AppCompatButton implements
         }
 
         @Override
-        public void onGoogleApiClientReady(final ObservableEmitter<String> emitter, final GoogleApiClient client) {
+        public void onGoogleApiClientReady(final ResourceObserver<String> emitter, final GoogleApiClient client) {
             if (activityResultCanceled(STATE_NAME)) {
                 // always check and handle responses after recieveStateResponse
                 emitter.onError(new GoogleLoginCanceledException());
@@ -100,7 +101,7 @@ public class CustomStateObserverExampleButton extends AppCompatButton implements
                             }
                         }
                     });
-            emitter.setDisposable(disposable);
+            emitter.add(disposable);
         }
 
 

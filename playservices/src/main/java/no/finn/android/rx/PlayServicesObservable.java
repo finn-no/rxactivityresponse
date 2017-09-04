@@ -7,7 +7,7 @@ import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 
-import io.reactivex.ObservableEmitter;
+import io.reactivex.observers.ResourceObserver;
 
 public class PlayServicesObservable extends PlayServicesBaseObservable<GoogleApiClient> {
     @SafeVarargs
@@ -21,7 +21,7 @@ public class PlayServicesObservable extends PlayServicesBaseObservable<GoogleApi
     }
 
     @Override
-    public void onGoogleApiClientReady(ObservableEmitter<GoogleApiClient> emitter, GoogleApiClient client) {
+    public void onGoogleApiClientReady(ResourceObserver<GoogleApiClient> emitter, GoogleApiClient client) {
         emitter.onNext(client);
     }
 }
